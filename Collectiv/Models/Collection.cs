@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Collectiv.Abstracts;
+using Collectiv.Bases;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -12,55 +14,27 @@ using System.Windows.Input;
 
 namespace Collectiv.Models
 {
-    public class Collection : INotifyPropertyChanged
+    public class Collection : ObservableBase
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private Action<int> removeChild;
         private int id;
         private int sequence;
-        private bool isConfirmed;
         private string name;
         private string description;
-        private ICollection<Item> items;
+        private ICollection<CollectionAttribute> attributes;
 
         public int Id { get => id; set { id = value; OnPropertyChanged(); } }
 
         public int Sequence { get => sequence; set { sequence = value; OnPropertyChanged(); } }
 
-        public bool IsConfirmed { get => isConfirmed; set { isConfirmed = value; OnPropertyChanged(); } }
-
         public string Name { get => name; set { name = value; OnPropertyChanged(); } }
 
         public string Description { get => description; set { description = value; OnPropertyChanged(); } }
 
-        public virtual ICollection<Item> Items { get => items; set { items = value; OnPropertyChanged(); } }
+        public virtual ICollection<CollectionAttribute> Attributes { get => attributes; set { attributes = value; OnPropertyChanged(); } }
 
         public Collection()
         {
-            Items = new ObservableCollection<Item>();
-        }
-
-        public Collection(Action<int> removeChild)
-            : this()
-        {
-            this.removeChild = removeChild;
-        }
-
-        public ICommand ConfirmCommand => new RelayCommand(execute =>
-        {
-            IsConfirmed = true;
-        });
-
-        public ICommand CancelCommand => new RelayCommand(execute =>
-        {
-            removeChild(Id);
-        });
-
-        [NotifyPropertyChangedInvocator]
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            Attributes = new ObservableCollection<CollectionAttribute>();
         }
     }
 }

@@ -3,10 +3,20 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Images\add.png" />
+    <None Remove="Images\cancel.png" />
+    <None Remove="Images\confirm.png" />
+    <None Remove="Images\edit.png" />
+    <None Remove="Images\remove.png" />
+    <None Remove="Images\save.png" />
+    <None Remove="Images\settings.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.8" />
@@ -15,6 +25,16 @@
 
   <ItemGroup>
     <Folder Include="Converters\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\add.png" />
+    <Resource Include="Images\cancel.png" />
+    <Resource Include="Images\confirm.png" />
+    <Resource Include="Images\edit.png" />
+    <Resource Include="Images\remove.png" />
+    <Resource Include="Images\save.png" />
+    <Resource Include="Images\settings.png" />
   </ItemGroup>
 
 </Project>

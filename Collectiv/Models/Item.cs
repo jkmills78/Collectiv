@@ -8,19 +8,19 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Collectiv.Abstracts;
+using Collectiv.Bases;
 
 namespace Collectiv.Models
 {
-    public class Item : INotifyPropertyChanged
+    public class Item : ObservableBase
     {
         private int id;
         private string name;
         private string description;
-        private ICollection<Attribute> attributes;
+        private ICollection<ItemAttribute> attributes;
         private ICollection<File> files;
         private Collection collection;
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public int Id { get => id; set { id = value; OnPropertyChanged(); } }
 
@@ -28,7 +28,7 @@ namespace Collectiv.Models
 
         public string Description { get => description; set { description = value; OnPropertyChanged(); } }
 
-        public virtual ICollection<Attribute> Attributes { get => attributes; set { attributes = value; OnPropertyChanged(); } }
+        public virtual ICollection<ItemAttribute> Attributes { get => attributes; set { attributes = value; OnPropertyChanged(); } }
 
         public virtual ICollection<File> Files { get => files; set { files = value; OnPropertyChanged(); } }
 
@@ -37,14 +37,8 @@ namespace Collectiv.Models
 
         public Item()
         {
-            Attributes = new ObservableCollection<Attribute>();
+            Attributes = new ObservableCollection<ItemAttribute>();
             Files = new ObservableCollection<File>();
-        }
-
-        [NotifyPropertyChangedInvocator]
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

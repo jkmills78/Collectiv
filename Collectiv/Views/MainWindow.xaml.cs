@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CollectionTracker.Views
+namespace Collectiv.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -31,8 +31,13 @@ namespace CollectionTracker.Views
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            foreach(var collectionViewModel in ((MainWindowViewModel)DataContext).CollectionViewModels)
+            {
+                collectionViewModel.RefreshCollectionList = CollectionList.Items.Refresh;
+            }
+
             // bind to the source
-            CollectionsViewSource.Source = ((MainWindowViewModel)DataContext).Collections;
+            CollectionsViewSource.Source = ((MainWindowViewModel)DataContext).CollectionViewModels;
         }
 
         //private void Button_Click(object sender, RoutedEventArgs e)
@@ -49,14 +54,9 @@ namespace CollectionTracker.Views
         protected override void OnClosing(CancelEventArgs e)
         {
             // clean up database connections
-            ((MainWindowViewModel)DataContext).Dispose();
+            App.DbContext.Dispose();
 
             base.OnClosing(e);
-        }
-
-        private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ((MainWindowViewModel)DataContext).SetCurrentCollection(((ListView)sender).SelectedItem);
         }
     }
 }

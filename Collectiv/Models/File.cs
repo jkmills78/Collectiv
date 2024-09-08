@@ -7,18 +7,17 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Collectiv.Bases;
 
 namespace Collectiv.Models
 {
-    public class File : INotifyPropertyChanged
+    public class File : ObservableBase
     {
         private int id;
         private string name;
         private string description;
         private string path;
         private Item item;
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public int Id { get => id; set { id = value; OnPropertyChanged(); } }
 
@@ -29,11 +28,5 @@ namespace Collectiv.Models
         public string Path { get => path; set { path = value; OnPropertyChanged(); } }
 
         public virtual Item Item { get => item; set { item = value; OnPropertyChanged(); } }
-
-        [NotifyPropertyChangedInvocator]
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

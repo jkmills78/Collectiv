@@ -1,4 +1,5 @@
-﻿using CollectionTracker;
+﻿using Collectiv;
+using Collectiv.Bases;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,64 +11,81 @@ using System.Windows.Input;
 
 namespace Collectiv.ViewModels
 {
-    public class MainWindowViewModel : IDisposable
+    public class MainWindowViewModel : ObservableBase
     {
-        public string Title { get; set; }
-        public ICollection<Models.Collection> Collections { get; set; }
+        private CollectionViewModel currentCollectionViewModel;
+        private ICollection<CollectionViewModel> collectionViewModels;
+        private string title;
 
-        private readonly ApplicationDbContext dbContext;
-        private Models.Collection currentCollection;
+        public CollectionViewModel CurrentCollectionViewModel { get => currentCollectionViewModel; set { currentCollectionViewModel = value; OnPropertyChanged(); } }
+        
+        public ICollection<CollectionViewModel> CollectionViewModels { get => collectionViewModels; set => collectionViewModels = value; }
+
+        public string Title { get => title; set { title = value; } }
 
         public MainWindowViewModel()
         {
-            dbContext = new ApplicationDbContext();
+            CurrentCollectionViewModel = new CollectionViewModel(RemoveCollection, SelectCollection);
+            CollectionViewModels = new ObservableCollection<CollectionViewModel>();
 
-            Collections = new ObservableCollection<Models.Collection>();
-
+            //App.DbContext.Database.EnsureDeleted();
             // this is for demo purposes only, to make it easier
             // to get up and running
-            dbContext.Database.EnsureCreated();
+            App.DbContext.Database.EnsureCreated();
             // load the entities into EF Core
-            dbContext.Collection.Load();
+            App.DbContext.Collection.Load();
 
-            Collections = dbContext.Collection.Local.ToObservableCollection();
+            foreach (var collection in App.DbContext.Collection.Local)
+            {
+                CollectionViewModels.Add(new CollectionViewModel(RemoveCollection, SelectCollection) { Collection = collection, IsConfirmed = true });
+            };
         }
 
         public ICommand AddCollectionCommand => new RelayCommand(execute =>
         {
-            Collections.Add(new Models.Collection(RemoveCollection)
+            CollectionViewModels.Add(new CollectionViewModel(RemoveCollection, SelectCollection)
             {
-                Id = Collections.Any() ? Collections.Max(x => x.Id) + 1 : 1
+                Collection = new Models.Collection()
+                {
+                    Id = CollectionViewModels.Any() ? CollectionViewModels.Max(x => x.Collection.Id) + 1 : 1 // Get the next Id and assign to the new collection
+                }
             });
         });
 
         public ICommand RemoveCollectionCommand => new RelayCommand(execute =>
         {
-            RemoveCollection(currentCollection.Id);
+            RemoveCollection();
+        });
+
+        public ICommand SaveCommand => new RelayCommand(execute =>
+        {
+            App.DbContext.UpdateRange(CollectionViewModels.Select(x => x.Collection));
+            // save data
+            App.DbContext.SaveChanges();
         });
 
         private void RemoveCollection()
         {
-            Collections.Remove(currentCollection);
+            CollectionViewModels.Remove(currentCollectionViewModel);
         }
 
-        private void RemoveCollection(int id)
+        //private void RemoveCollection(int id)
+        //{
+        //    var collectionViewModel = CollectionViewModels.SingleOrDefault(collectionViewModel => collectionViewModel.Collection.Id == id);
+        //    if (collectionViewModel != null)
+        //    {
+        //        CollectionViewModels.Remove(collectionViewModel);
+        //    }
+        //}
+
+        private void SelectCollection(int id)
         {
-            var collection = Collections.SingleOrDefault(collection => collection.Id == id);
-            if (collection != null)
-            {
-                Collections.Remove(collection);
-            }
+            CurrentCollectionViewModel = CollectionViewModels.SingleOrDefault(viewModel => viewModel.Collection.Id == id);
         }
 
-        public void Dispose()
+        public void SetCurrentCollection(object currentCollectionViewModel)
         {
-            dbContext.Dispose();
-        }
-
-        public void SetCurrentCollection(object currentCollection)
-        {
-            this.currentCollection = (Models.Collection)currentCollection;
+            this.currentCollectionViewModel = (CollectionViewModel)currentCollectionViewModel;
         }
     }
 }

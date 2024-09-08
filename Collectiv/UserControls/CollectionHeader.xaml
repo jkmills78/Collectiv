@@ -6,10 +6,22 @@
              xmlns:local="clr-namespace:Collectiv.UserControls">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <Image x:Key="ConfirmImage" Source="pack://application:,,,/Images/confirm.png"/>
+        <Image x:Key="CancelImage" Source="pack://application:,,,/Images/cancel.png"/>
+        <Image x:Key="EditImage" Source="pack://application:,,,/Images/edit.png"/>
+        <Image x:Key="SettingsImage" Source="pack://application:,,,/Images/settings.png"/>
     </UserControl.Resources>
     <Grid>
-        <StackPanel Orientation="Horizontal">
-            <StackPanel.Style>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Style>
                 <Style>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding ElementName=CollectionName, Path=Visibility}" Value="Visible">
@@ -17,11 +29,24 @@
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </StackPanel.Style>
-            <TextBox Text="{Binding Name}" Width="200"/>
-            <Button Content="@" Command="{Binding ConfirmCommand}"/>
-            <Button Content="!" Command="{Binding CancelCommand}"/>
-        </StackPanel>
-        <TextBlock x:Name="CollectionName" Text="{Binding Name}" Visibility="{Binding IsConfirmed, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </Grid.Style>
+            <TextBox Text="{Binding Collection.Name}" Grid.Column="0" Margin="5" VerticalAlignment="Center" FontSize="18"/>
+            <StackPanel Orientation="Horizontal" Grid.Column="1">
+                <Button Content="{StaticResource ConfirmImage}" Margin="0 5 5 5" Width="32" Height="32" Background="Transparent" BorderBrush="Transparent" Command="{Binding ConfirmCommand}"/>
+                <Button Content="{StaticResource CancelImage}" Margin="0 5 5 5" Width="32" Height="32" Background="Transparent" BorderBrush="Transparent" Command="{Binding CancelCommand}"/>
+            </StackPanel>
+        </Grid>
+        <Grid x:Name="CollectionName" Visibility="{Binding IsConfirmed, Converter={StaticResource BooleanToVisibilityConverter}}" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Collection.Name}" Grid.Column="0" Margin="5" VerticalAlignment="Center" FontSize="18"/>
+            <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
+                <Button Content="{StaticResource SettingsImage}" Margin="0 5 5 5" Width="32" Height="32" HorizontalAlignment="Right" Background="Transparent" BorderBrush="Transparent" Command="{Binding ToggleSettingsCommand}"/>
+                <Button Content="{StaticResource EditImage}" Margin="0 5 5 5" Width="32" Height="32" HorizontalAlignment="Right" Background="Transparent" BorderBrush="Transparent" Command="{Binding EditNameCommand}"/>
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </UserControl>

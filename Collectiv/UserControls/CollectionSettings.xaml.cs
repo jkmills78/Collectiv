@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Collectiv.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,17 @@ namespace Collectiv.UserControls
     /// </summary>
     public partial class CollectionSettings : UserControl
     {
+        private CollectionViewSource AttributesViewSource;
+
         public CollectionSettings()
         {
             InitializeComponent();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // bind to the source
+            AttributesViewSource.Source = ((CollectionViewModel)DataContext).AvailableAttributeViewModels;
         }
     }
 }

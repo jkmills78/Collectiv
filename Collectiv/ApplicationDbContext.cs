@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace Collectiv
 {
-    internal class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : DbContext
     {
         public DbSet<Collection> Collection { get; set; }
         public DbSet<Item> Item { get; set; }
-        public DbSet<Models.Attribute> Attribute { get; set; }
+        public DbSet<ItemAttribute> ItemAttribute { get; set; }
+        public DbSet<ItemAttribute> CollectionAttribute { get; set; }
         public DbSet<File> File { get; set; }
 
         private readonly string connectionString;
@@ -34,7 +35,7 @@ namespace Collectiv
             modelBuilder.Entity<Item>()
                 .HasKey(x => x.Id);
 
-            modelBuilder.Entity<Models.Attribute>()
+            modelBuilder.Entity<Abstracts.Attribute>()
                 .HasKey(x => x.Id);
 
             modelBuilder.Entity<File>()
@@ -48,11 +49,11 @@ namespace Collectiv
                 .Property(b => b.Name)
                 .IsRequired();
 
-            modelBuilder.Entity<Models.Attribute>()
+            modelBuilder.Entity<Abstracts.Attribute>()
                 .Property(b => b.Name)
                 .IsRequired();
 
-            modelBuilder.Entity<Models.Attribute>()
+            modelBuilder.Entity<Abstracts.Attribute>()
                 .Property(b => b.Value)
                 .IsRequired();
 

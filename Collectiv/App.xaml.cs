@@ -1,14 +1,16 @@
-﻿using System.Configuration;
+﻿using Collectiv;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
-namespace CollectionTracker
+namespace Collectiv
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
+        public static readonly ApplicationDbContext DbContext = new ApplicationDbContext();
     }
 
 }
