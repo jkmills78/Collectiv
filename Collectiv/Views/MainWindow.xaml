@@ -1,0 +1,60 @@
+﻿<Window x:Class="CollectionTracker.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CollectionTracker"
+        xmlns:viewmodels="clr-namespace:Collectiv.ViewModels"
+        xmlns:usercontrols="clr-namespace:Collectiv.UserControls"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
+    <Window.Resources>
+        <CollectionViewSource x:Key="CollectionsViewSource"/>
+        <CollectionViewSource x:Key="ItemsViewSource" 
+                      Source="{Binding Items, Source={StaticResource CollectionsViewSource}}"/>
+        <CollectionViewSource x:Key="AttributeViewSource" 
+              Source="{Binding Attributes, Source={StaticResource ItemsViewSource}}"/>
+        <CollectionViewSource x:Key="ImagesViewSource" 
+              Source="{Binding Images, Source={StaticResource ItemsViewSource}}"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Content="+" Command="{Binding AddCollectionCommand}"/>
+                <Button Content="-" Command="{Binding RemoveCollectionCommand}"/>
+            </StackPanel>
+            <ListView Grid.Row="1"
+                      ItemsSource="{Binding Source={StaticResource CollectionsViewSource}}"
+                      SelectionChanged="ListView_SelectionChanged">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <usercontrols:CollectionHeader/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+        <GridSplitter Grid.Column="1" 
+              HorizontalAlignment="Left" 
+              VerticalAlignment="Stretch"
+              Background="Black" 
+              ShowsPreview="true"
+              Width="5"/>
+        <Grid Grid.Column="2">
+            
+        </Grid>
+    </Grid>
+</Window>
