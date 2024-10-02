@@ -1,32 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using Collectiv.Bases;
+using Collectiv.Interfaces;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Collectiv.Bases;
 
 namespace Collectiv.Models
 {
-    public class File : ObservableBase
+    public partial class File : Entity
     {
-        private int id;
-        private string name;
-        private string description;
-        private string path;
-        private Item item;
+        [ObservableProperty]
+        private Guid filePackageId;
 
-        public int Id { get => id; set { id = value; OnPropertyChanged(); } }
+        [ObservableProperty]
+        private bool isPrimary;
 
-        public string Name { get => name; set { name = value; OnPropertyChanged(); } }
+        [ObservableProperty]
+        private int sequence;
 
-        public string Description { get => description; set { description = value; OnPropertyChanged(); } }
+        [Required]
+        [ObservableProperty]
+        private string fullPath;
 
-        public string Path { get => path; set { path = value; OnPropertyChanged(); } }
+        [Required]
+        [ObservableProperty]
+        private string mimeType;
 
-        public virtual Item Item { get => item; set { item = value; OnPropertyChanged(); } }
+        private FilePackage filePackage;
+        public virtual FilePackage FilePackage { get => filePackage; set { filePackage = value; OnPropertyChanged(); } }
     }
 }

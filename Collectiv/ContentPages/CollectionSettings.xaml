@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:contentViews="clr-namespace:Collectiv.ContentViews"
+             x:Class="Collectiv.ContentPages.CollectionSettings"
+             Title="CollectionSettings">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.Background>
+            <RadialGradientBrush Center="0.5,0.5">
+                <RadialGradientBrush.GradientStops>
+                    <GradientStop Color="#34251f" Offset="0" />
+                    <GradientStop Color="#000000" Offset="1.3" />
+                </RadialGradientBrush.GradientStops>
+            </RadialGradientBrush>
+        </Grid.Background>
+        <Label Grid.Row="0" TextColor="#f3f3f3" FontSize="18" FontAttributes="Bold">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="{Binding Collection.Name}"/>
+                    <Span Text=": Settings"/>
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+        <Line Grid.Row="1" X1="0" Y1="0" X2="100" Y2="0"/>
+        <Grid Grid.Row="2">
+            <VerticalStackLayout>
+                <Label Text="Attributes Available to Items" Margin="5" VerticalOptions="Center" HorizontalOptions="Center" TextColor="#f3f3f3"/>
+                <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
+                    <Button Text="Add Attribute" Margin="0,5,5,5" Command="{Binding CollectionViewModel.AddAttributeCommand}">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe2c0;"/>
+                        </Button.ImageSource>
+                    </Button>
+                    <Button Text="Remove Attribute" Margin="0,5,5,5" Command="{Binding CollectionViewModel.RemoveAttributeCommand}">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe2cf;"/>
+                        </Button.ImageSource>
+                    </Button>
+                </HorizontalStackLayout>
+                <CollectionView SelectionMode="Single"
+                                ItemsSource="{Binding CollectionViewModel.AvailableAttributeViewModels}"
+                                SelectedItem="{Binding CollectionViewModel.AvailableAttributeViewModels.SelectedItem}"
+                                Grid.Row="1">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <contentViews:CollectionAttribute/>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

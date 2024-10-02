@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Collectiv.ContentViews.CollectionHeader">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Color="#000000" Offset="0.9" />
+                    <GradientStop Color="#1f2234" Offset="1" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Rectangle Grid.Column="0" Background="#00d933" IsVisible="{Binding IsSelected}"/>
+        <Grid Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Reference ContainerName}, Path=IsVisible}" Value="True" TargetType="Grid">
+                            <Setter Property="IsVisible" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Entry Placeholder="Collection Name..." Text="{Binding Container.Name}" Grid.Column="0" MinimumWidthRequest="100" Margin="0,5,0,5" VerticalOptions="Center" TextColor="#f3f3f3" FontSize="18"/>
+            <HorizontalStackLayout Grid.Column="1">
+                <Button Margin="0,5,5,5" Command="{Binding ConfirmContainerCommand}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf299;"/>
+                    </Button.ImageSource>
+                </Button>
+                <Button Margin="0,5,5,5" Command="{Binding CancelContainerCommand}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf36e;"/>
+                    </Button.ImageSource>
+                </Button>
+            </HorizontalStackLayout>
+        </Grid>
+        <Grid x:Name="ContainerName" IsVisible="{Binding IsConfirmed}" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Label Text="{Binding Container.Name}" Grid.Column="0" Margin="5" VerticalOptions="Center" FontSize="18" TextColor="#f3f3f3"/>
+            <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End">
+                <Button Margin="0,5,5,5" HorizontalOptions="End" Command="{Binding EditContainerNameCommand}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf3de;"/>
+                    </Button.ImageSource>
+                </Button>
+            </HorizontalStackLayout>
+        </Grid>
+    </Grid>
+</ContentView>

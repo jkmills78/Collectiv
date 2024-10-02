@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Collectiv.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:contentPages="clr-namespace:Collectiv.ContentPages"
+    Title="Collectiv">
+    <Shell.FlyoutHeader>
+        <Label Text="Collectiv"/>
+    </Shell.FlyoutHeader>
+
+    <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
+        <ShellContent Title="Collections" ContentTemplate="{DataTemplate contentPages:MainPage}">
+            <ShellContent.Icon>
+                <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf2f2;" Color="#434343"/>
+            </ShellContent.Icon>
+            <ShellContent.FlyoutIcon>
+                <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf2f2;" Color="#434343"/>
+            </ShellContent.FlyoutIcon>
+        </ShellContent>
+        <ShellContent Title="Advanced Search" ContentTemplate="{DataTemplate contentPages:MainPage}">
+            <ShellContent.Icon>
+                <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#x000f0637;" Color="#434343"/>
+            </ShellContent.Icon>
+            <ShellContent.FlyoutIcon>
+                <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#x000f0637;" Color="#434343"/>
+            </ShellContent.FlyoutIcon>
+        </ShellContent>
+        <Tab Title="App Settings">
+            <Tab.Icon>
+                <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf325;" Color="#434343"/>
+            </Tab.Icon>
+            <Tab.FlyoutIcon>
+                <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf325;" Color="#434343"/>
+            </Tab.FlyoutIcon>
+            <ShellContent Title="Host Settings" ContentTemplate="{DataTemplate contentPages:HostSettings}">
+                <ShellContent.Icon>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe43c;" Color="#434343"/>
+                </ShellContent.Icon>
+                <ShellContent.FlyoutIcon>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe43c;" Color="#434343"/>
+                </ShellContent.FlyoutIcon>
+            </ShellContent>
+            <ShellContent Title="Data Control" ContentTemplate="{DataTemplate contentPages:MainPage}">
+                <ShellContent.Icon>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#x000f0306;" Color="#434343"/>
+                </ShellContent.Icon>
+                <ShellContent.FlyoutIcon>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#x000f0306;" Color="#434343"/>
+                </ShellContent.FlyoutIcon>
+            </ShellContent>
+        </Tab>        
+    </FlyoutItem>
+</Shell>

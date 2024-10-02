@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:Collectiv.Converters"
+             xmlns:contentViews="clr-namespace:Collectiv.ContentViews"
+             xmlns:viewModels="clr-namespace:Collectiv.ViewModels"
+             x:Class="Collectiv.ContentPages.FilePackageDetails"
+             Title="FilePackageDetails">
+    <ContentPage.Resources>
+        <converters:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter"/>
+    </ContentPage.Resources>
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+        <Grid.Background>
+            <RadialGradientBrush Center="0.5,0.5">
+                <RadialGradientBrush.GradientStops>
+                    <GradientStop Color="#323500" Offset="0" />
+                    <GradientStop Color="#000000" Offset="1.3" />
+                </RadialGradientBrush.GradientStops>
+            </RadialGradientBrush>
+        </Grid.Background>
+        <Button Text="Delete File Package" Command="{Binding FilePackageViewModel.RemoveFilePackageCommand}" Grid.Row="0" Background="#aa0000" HorizontalOptions="End" Margin="5">
+            <Button.ImageSource>
+                <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf34d;"/>
+            </Button.ImageSource>
+        </Button>
+        <Image Source="{Binding FilePackageViewModel.CoverImage.FileData, Converter={StaticResource ByteArrayToImageSourceConverter}}" Margin="5" Grid.Row="1"/>
+        <Entry Placeholder="File Package Name..." Text="{Binding FilePackageViewModel.FilePackage.Name}" Grid.Row="2" Margin="10"/>
+        <ScrollView Grid.Row="3">
+            <Editor Placeholder="File Package Description..."
+                    Text="{Binding FilePackageViewModel.FilePackage.Description}"
+                    HeightRequest="200"
+                    Margin="10,0,10,10"/>
+        </ScrollView>
+        <Grid RowDefinitions="Auto,*,Auto,Auto,Auto" Grid.Row="4">
+            <Border Margin="5,0,5,0" StrokeThickness="0">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="40,40,0,0"/>
+                </Border.StrokeShape>
+                <Button Text="Add File" Command="{Binding FilePackageViewModel.AddFileCommand}" Grid.Row="0" CornerRadius="0">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe4dc;"/>
+                    </Button.ImageSource>
+                </Button>
+            </Border>
+            <Border Grid.Row="1" Margin="5,0,5,5" Padding="20" VerticalOptions="FillAndExpand">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="0,0,10,10" />
+                </Border.StrokeShape>
+                <ScrollView VerticalOptions="FillAndExpand">
+                    <CollectionView ItemsSource="{Binding FilePackageViewModel.FileViewModels}" VerticalOptions="FillAndExpand">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <contentViews:File/>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+            </Border>
+            <Grid ColumnDefinitions="Auto,Auto" Grid.Row="2" HorizontalOptions="End" Margin="5">
+                <Button Text="Save" Command="{Binding FilePackageViewModel.SaveFilePackageCommand}" Grid.Column="0" Margin="5">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf680;"/>
+                    </Button.ImageSource>
+                </Button>
+                <Button Text="Cancel" Command="{Binding FilePackageViewModel.CancelFilePackageCommand}" Grid.Column="1" Margin="0,5,5,5">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf1a0;"/>
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

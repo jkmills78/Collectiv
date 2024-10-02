@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:Collectiv.Converters"
+             xmlns:viewModels="clr-namespace:Collectiv.ViewModels"
+             x:Class="Collectiv.ContentViews.File">
+    <ContentView.Resources>
+        <converters:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter"/>
+    </ContentView.Resources>
+    <Border Margin="0,10,0,10" Padding="20" Background="AliceBlue">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="10,10,10,10" />
+        </Border.StrokeShape>
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <Image x:Name="Thumbnail"
+                   Source="{Binding FileData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                   Grid.Column="0"
+                   Margin="5"
+                   WidthRequest="125" 
+                   HeightRequest="125" 
+                   IsVisible="{Binding IsImageFile}"/>
+            <Image Grid.Column="0"
+                   Margin="5"
+                   WidthRequest="125" 
+                   HeightRequest="125">
+                <Image.Source>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe532;" Color="#434343"/>
+                </Image.Source>
+                <Image.Style>
+                    <Style TargetType="Image">
+                        <Setter Property="IsVisible" Value="False"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Reference Thumbnail}, Path=IsVisible}" Value="False" TargetType="Grid">
+                                <Setter Property="IsVisible" Value="True"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Image.Style>
+            </Image>
+            <Grid RowDefinitions="Auto,Auto" Grid.Column="1" VerticalOptions="Center">
+                <Label Text="{Binding FileName}" Grid.Row="0" Margin="5"/>
+                <Label Text="{Binding FileSize}" Grid.Row="1" FontAttributes="Italic" Margin="5,0,5,5"/>
+            </Grid>
+            <Button Text="Delete File" Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:FilePackageDetailsViewModel}}, Path=FilePackageViewModel.RemoveFileCommand}" CommandParameter="{Binding .}" Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf384;"/>
+                </Button.ImageSource>
+            </Button>
+        </Grid>
+    </Border>
+</ContentView>
