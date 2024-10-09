@@ -15,7 +15,7 @@ namespace Collectiv.Converters
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            return (bool)value ? parameter : null;
+            return (bool)value ? parameter : Binding.DoNothing;
         }
     }
 }

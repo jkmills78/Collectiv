@@ -10,4 +10,11 @@ public partial class FilePackageDetails : ContentPage
         InitializeComponent();
         ViewModel = viewModel;
     }
+
+    protected override bool OnBackButtonPressed()
+    {
+        Task.Run(ViewModel.FilePackageViewModel.Cancel).Wait();
+
+        return base.OnBackButtonPressed();
+    }
 }

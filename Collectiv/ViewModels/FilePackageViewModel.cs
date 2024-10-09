@@ -1,4 +1,5 @@
-﻿using Collectiv.Bases;
+﻿using Collectiv.Abstracts;
+using Collectiv.Common.DTOs;
 using Collectiv.ContentPages;
 using Collectiv.Models;
 using MimeDetective;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,17 +36,55 @@ namespace Collectiv.ViewModels
         [ObservableProperty]
         private bool isMarkedForDeletion;
 
+        private FilePackage oldFilePackage;
+
+        public event EventHandler CoverImageChanged;
+
         public FilePackageViewModel(IServiceProvider serviceProvider, FilePackage filePackage)
             : base(serviceProvider)
         {
             FilePackage = filePackage;
+            oldFilePackage = new FilePackage();
+            CopyFilePackage(FilePackage, oldFilePackage);
+
             FileViewModels = new ObservableCollection<FileViewModel>();
 
-            ((ObservableCollection<FileViewModel>)FileViewModels).CollectionChanged += FilePackageViewModel_CollectionChanged;
+            ((ObservableCollection<FileViewModel>)FileViewModels).CollectionChanged += FileViewModels_CollectionChanged;
+            FilePackage.PropertyChanged += FilePackage_PropertyChanged;
         }
 
-        private void FilePackageViewModel_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void FilePackage_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == "IsPrimary")
+            {
+                CoverImageChanged?.Invoke(this, null);
+            }
+        }
+
+        private void FileViewModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (FileViewModel fileViewModel in e.NewItems)
+                {
+                    if (!FilePackage.Files.Any(file => file.Id == fileViewModel.File.Id))
+                    {
+                        FilePackage.Files.Add(fileViewModel.File);
+                    }
+                }
+            }
+
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                foreach (FileViewModel fileViewModel in e.OldItems)
+                {
+                    if (FilePackage.Files.Any(file => file.Id == fileViewModel.File.Id))
+                    {
+                        FilePackage.Files.Remove(fileViewModel.File);
+                    }
+                }
+            }
+
             FileCount = FileViewModels.Count;
         }
 
@@ -54,7 +94,7 @@ namespace Collectiv.ViewModels
             var pickedFile = await fileService.PickAFile();
             if (pickedFile != null)
             {
-                var fileStream = pickedFile.OpenReadAsync().Result;
+                var fileStream = await pickedFile.OpenReadAsync();
                 byte[] fileData = new byte[fileStream.Length];
                 fileStream.Read(fileData, 0, fileData.Length);
 
@@ -70,12 +110,12 @@ namespace Collectiv.ViewModels
                     Id = Guid.NewGuid(),
                     FilePackageId = FilePackage.Id,
                     FullPath = pickedFile.FullPath,
-                    MimeType = mimeType
+                    MimeType = mimeType,
+                    Sequence = FileViewModels.Select(viewModel => viewModel?.File?.Sequence).Max() + 1 ?? 1
                 };
 
                 var fileViewModel = new FileViewModel(serviceProvider, file) { FileData = fileData };
                 FileViewModels.Add(fileViewModel);
-                FilePackage.Files.Add(fileViewModel.File);
             }
         }
 
@@ -89,7 +129,6 @@ namespace Collectiv.ViewModels
         async Task RemoveFilePackage()
         {
             IsMarkedForDeletion = true;
-            IsConfirmed = false;
             await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
             {
                 { "FilePackageViewModel", this }
@@ -99,8 +138,69 @@ namespace Collectiv.ViewModels
         [RelayCommand]
         async Task SaveFilePackage()
         {
-            IsMarkedForDeletion = false;
-            IsConfirmed = true;
+            if (await applicationDbService.ExistsAsync<FilePackage>(FilePackage.Id))
+            {
+                foreach (var file in FilePackage.Files)
+                {
+                    await applicationDbService.SetFilePrimacyAsync(file);
+
+                    // Delete
+                    foreach (var fileToDelete in (await applicationDbService.GetAsync<Models.File>()).Where(file => file.FilePackageId == FilePackage.Id))
+                    {
+                        if (FilePackage.Files.All(file => file.Id != fileToDelete.Id))
+                        {
+                            if (App.HostMode.Value == "Hosted")
+                            {
+                                await restService.DeleteFileAsync(fileToDelete.FilePackage.ContainerId, fileToDelete.FilePackageId, Path.GetFileName(file.FullPath));
+                            }
+                            await applicationDbService.RemoveAsync<Models.File>(fileToDelete.Id);
+                        }
+                    }
+
+                    // Update
+                    if (await applicationDbService.ExistsAsync<Models.File>(file.Id))
+                    {
+                        await applicationDbService.UpdateAsync(file);
+                    }
+
+                    // Add
+                    if (!await applicationDbService.ExistsAsync<Models.File>(file.Id))
+                    {
+                        await applicationDbService.AddAsync(file);
+                    }
+                    await applicationDbService.UpdateAsync(FilePackage);
+                }   
+            }
+            else
+            {
+                await applicationDbService.AddAsync(FilePackage);
+            }
+
+            var filePackageDto = new FilePackageDTO
+            {
+                ContainerId = FilePackage.ContainerId,
+                Id = FilePackage.Id,
+                Name = FilePackage.Name,
+                Description = FilePackage.Description
+            };
+
+            foreach (var fileViewModel in FileViewModels)
+            {
+                filePackageDto.Files.Add(new FileDTO
+                {
+                    FilePackageId = fileViewModel.File.FilePackageId,
+                    FileName = fileViewModel.FileName,
+                    FullPath = fileViewModel.File.FullPath,
+                    MimeType = fileViewModel.File.MimeType,
+                    FileData = fileViewModel.FileData
+                });
+            }
+
+            if (App.HostMode.Value == "Hosted")
+            {
+                await restService.PostFilePackageAsync(filePackageDto);
+            }
+
             await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
             {
                 { "FilePackageViewModel", this }
@@ -110,12 +210,41 @@ namespace Collectiv.ViewModels
         [RelayCommand]
         async Task CancelFilePackage()
         {
-            IsMarkedForDeletion = false;
-            IsConfirmed = false;
+            await Cancel();
+
             await Shell.Current.GoToAsync("..", true, new Dictionary<string, object>
             {
                 { "FilePackageViewModel", this }
             });
+        }
+
+        public async Task Cancel()
+        {
+            await applicationDbService.CancelAllChangesAsync();
+            CopyFilePackage(oldFilePackage, FilePackage);
+            FileViewModels.Clear();
+            foreach (var file in FilePackage.Files)
+            {
+                FileViewModels.Add(new FileViewModel(serviceProvider, file));
+            }
+        }
+
+        private void CopyFilePackage(FilePackage source, FilePackage destination)
+        {
+            destination.Id = source.Id;
+            destination.Container = source.Container;
+            destination.ContainerId = source.ContainerId;
+            destination.IsPrimary = source.IsPrimary;
+            destination.Sequence = source.Sequence;
+            destination.Name = source.Name;
+            destination.Description = source.Description;
+
+            destination.Files.Clear();
+
+            foreach (var file in source.Files)
+            {
+                destination.Files.Add(file);
+            }
         }
     }
 }

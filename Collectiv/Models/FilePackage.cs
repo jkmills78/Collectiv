@@ -1,4 +1,4 @@
-﻿using Collectiv.Bases;
+﻿using Collectiv.Abstracts;
 using Collectiv.Interfaces;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using Collectiv.Bases;
+﻿using Collectiv.Abstracts;
 using ByteSizeLib;
 using File = Collectiv.Models.File;
 

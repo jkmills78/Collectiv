@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:Collectiv.Converters"
              x:Class="Collectiv.ContentViews.ItemHeader">
-    <Grid>
+    <ContentView.Resources>
+        <converters:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter"/>
+    </ContentView.Resources>
+    <Grid Margin="5">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.Background>
@@ -15,7 +19,12 @@
                 </LinearGradientBrush.GradientStops>
             </LinearGradientBrush>
         </Grid.Background>
-        <Rectangle Grid.Column="0" Background="#00d933" IsVisible="{Binding IsSelected}"/>
+        <Image x:Name="Thumbnail"
+               Source="{Binding CoverImage.FileData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+               Grid.Column="0"
+               MaximumWidthRequest="75" 
+               MaximumHeightRequest="75" 
+               IsVisible="{Binding CoverImage.IsImageFile, FallbackValue=False}"/>
         <Grid Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -30,7 +39,7 @@
                     </Style.Triggers>
                 </Style>
             </Grid.Style>
-            <Entry Placeholder="Item Name..." Text="{Binding Container.Name}" Grid.Column="0" MinimumWidthRequest="100" Margin="0,5,0,5" VerticalOptions="Center" TextColor="#f3f3f3" FontSize="18"/>
+            <Entry Placeholder="Item Name..." Text="{Binding Container.Name}" Grid.Column="0" MinimumWidthRequest="100" Margin="0,5,5,5" VerticalOptions="Center" FontSize="Medium"/>
             <HorizontalStackLayout Grid.Column="1">
                 <Button Margin="0,5,5,5" Command="{Binding ConfirmContainerCommand}">
                     <Button.ImageSource>
@@ -49,7 +58,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Label Text="{Binding Container.Name}" Grid.Column="0" Margin="5" VerticalOptions="Center" FontSize="18" TextColor="#f3f3f3"/>
+            <Label Text="{Binding Container.Name}" Grid.Column="0" Margin="5" VerticalOptions="Center" FontSize="Medium" TextColor="#f3f3f3"/>
             <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End">
                 <Button Margin="0,5,5,5" HorizontalOptions="End" Command="{Binding EditContainerNameCommand}">
                     <Button.ImageSource>

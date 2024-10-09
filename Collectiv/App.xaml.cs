@@ -19,6 +19,7 @@ namespace Collectiv
             var settingsDbService = serviceProvider.GetService<SettingsDbService>();
 
             //applicationDbService.DestroyDatabaseAsync<Container>().Wait();
+            //settingsDbService.DestroyDatabaseAsync<Container>().Wait();
 
             applicationDbService.InitializeAsync<Container>().Wait();
             settingsDbService.InitializeAsync<Setting>().Wait();

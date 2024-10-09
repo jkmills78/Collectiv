@@ -4,6 +4,17 @@
              xmlns:contentViews="clr-namespace:Collectiv.ContentViews"
              xmlns:viewModels="clr-namespace:Collectiv.ViewModels"
              x:Class="Collectiv.ContentPages.MainPage">
+    <Shell.TitleView>
+        <Grid>
+            <Label VerticalOptions="Center" FontSize="Large" Margin="5,0,0,0">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Collections"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </Grid>
+    </Shell.TitleView>
     <Grid RowDefinitions="Auto,*">
         <Grid.Background>
             <RadialGradientBrush Center="0.5,0.5">
@@ -13,11 +24,10 @@
                 </RadialGradientBrush.GradientStops>
             </RadialGradientBrush>
         </Grid.Background>
-        <Border Margin="5,0,5,0" StrokeThickness="0">
+        <Border Margin="5,0,5,0" StrokeThickness="0" Grid.Row="0">
             <Border.StrokeShape>
                 <RoundRectangle CornerRadius="40,40,0,0"/>
             </Border.StrokeShape>
-
             <Button Text="Add Collection" Command="{Binding AddCollectionCommand}" Grid.Row="0" CornerRadius="0">
                 <Button.ImageSource>
                     <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#x000f0266;"/>

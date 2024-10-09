@@ -11,7 +11,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Collectiv.Bases
+namespace Collectiv.Abstracts
 {
     public abstract partial class ViewModel : ObservableObject
     {

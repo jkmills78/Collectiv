@@ -1,6 +1,8 @@
-﻿using Collectiv.Bases;
+﻿using Collectiv.Abstracts;
 using Collectiv.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +14,11 @@ namespace Collectiv.Abstracts
 {
     public abstract class DatabaseService<TContext> where TContext : DbContext
     {
-        private readonly TContext dbContext;
-        private ILoggingService loggingService;
+        internal readonly TContext dbContext;
 
         public DatabaseService(IServiceProvider serviceProvider, TContext dbContext)
         {
             this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            loggingService = serviceProvider.GetService<ILoggingService>();
         }
 
         public async virtual Task AddAsync<TEntity>(TEntity entity) where TEntity : Entity
@@ -31,9 +31,10 @@ namespace Collectiv.Abstracts
                     dbContext.SaveChanges();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                loggingService.LogException(ex);
+                // TODO: Surface error to user or otherwise log
+                return;
             }
         }
         public async virtual Task<TEntity> GetAsync<TEntity>(Guid id) where TEntity : Entity
@@ -61,9 +62,10 @@ namespace Collectiv.Abstracts
                 }
                 await dbContext.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch
             {
-                loggingService.LogException(ex);
+                // TODO: Surface error to user or otherwise log
+                return;
             }
         }
 
@@ -78,9 +80,10 @@ namespace Collectiv.Abstracts
                     await dbContext.SaveChangesAsync();
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                loggingService.LogException(ex);
+                // TODO: Surface error to user or otherwise log
+                return;
             }
         }
 
@@ -112,13 +115,29 @@ namespace Collectiv.Abstracts
 
         public async Task DestroyDatabaseAsync<TEntity>() where TEntity : Entity
         {
-            await dbContext.Database.EnsureDeletedAsync();
+            try
+            {
+                await dbContext.Database.EnsureDeletedAsync();
+            }
+            catch
+            {
+                // TODO: Surface error to user or otherwise log
+                return;
+            }
         }
 
         public async Task InitializeAsync<TEntity>() where TEntity : Entity
         {
-            await dbContext.Database.EnsureCreatedAsync();
-            await dbContext.Set<TEntity>().LoadAsync();
+            try
+            {
+                await dbContext.Database.EnsureCreatedAsync();
+                await dbContext.Set<TEntity>().LoadAsync();
+            }
+            catch
+            {
+                // TODO: Surface error to user or otherwise log
+                return;
+            }
         }
     }
 }

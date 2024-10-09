@@ -1,4 +1,5 @@
 ﻿using Collectiv.Interfaces;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +10,6 @@ namespace Collectiv.Services
 {
     public class FileService : IFileService
     {
-        private readonly ILoggingService loggingService;
-
-        public FileService(ILoggingService loggingService)
-        {
-            this.loggingService = loggingService;
-        }
-
         public async Task<FileResult> PickAFile()
         {
             try
@@ -33,13 +27,11 @@ namespace Collectiv.Services
 
                 return result;
             }
-            catch (Exception ex)
+            catch
             {
-                // The user canceled or something went wrong
-                loggingService.LogException(ex);
+                // TODO: Surface error to user or otherwise log
+                return null;
             }
-
-            return null;
         }
     }
 }

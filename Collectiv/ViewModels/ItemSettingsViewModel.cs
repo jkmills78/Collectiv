@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Collectiv.ViewModels
 {
-    [QueryProperty("CollectionViewModel", "CollectionViewModel")]
-    public partial class CollectionSettingsViewModel : ObservableObject
+    [QueryProperty("ItemViewModel", "ItemViewModel")]
+    public partial class ItemSettingsViewModel : ObservableObject
     {
         [ObservableProperty]
-        private CollectionViewModel collectionViewModel;
+        private ItemViewModel itemViewModel;
 
-        public CollectionSettingsViewModel()
+        public ItemSettingsViewModel()
         {
             
         }

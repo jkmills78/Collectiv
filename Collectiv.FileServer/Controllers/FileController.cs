@@ -1,4 +1,5 @@
 ﻿using Collectiv.Common.DTOs;
+using Collectiv.FileServer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using MimeDetective;
 using System.IO;
@@ -15,29 +16,32 @@ namespace Collectiv.FileServer.Controllers
     {
         private IWebHostEnvironment webHostEnvironment;
         private readonly ILogger<FileController> logger;
-        private const string baseDir = "/UserData";
+        private IFileService fileService;
 
-        public FileController(ILogger<FileController> logger, IWebHostEnvironment webHostEnvironment)
+        public FileController(ILogger<FileController> logger, IWebHostEnvironment webHostEnvironment, IFileService fileService)
         {
             this.logger = logger;
             this.webHostEnvironment = webHostEnvironment;
+            this.fileService = fileService;
         }
 
         // GET: api/<FileController>?containerId=1&packageId=1&fileName=image.jpg"
         [HttpGet]
         public IActionResult Get([FromQuery] Guid containerId, [FromQuery] Guid packageId, [FromQuery] string fileName)
         {
-            var fullPath = Path.Combine(baseDir, containerId.ToString(), packageId.ToString(), fileName);
-            byte[] file = GetFile(fullPath);
-            var Inspector = new ContentInspectorBuilder()
+            byte[] file = fileService.GetFile(containerId, packageId, fileName);
+            if (file != Array.Empty<byte>())
             {
-                Definitions = MimeDetective.Definitions.Default.All()
-            }.Build();
+                var Inspector = new ContentInspectorBuilder()
+                {
+                    Definitions = MimeDetective.Definitions.Default.All()
+                }.Build();
 
-            var mimeType = Inspector.Inspect(file)[0].Definition.File.MimeType;
-            if (file != null && mimeType != null)
-            {
-                return File(file, mimeType, fileName);
+                var mimeType = Inspector.Inspect(file)[0].Definition.File.MimeType;
+                if (mimeType != null)
+                {
+                    return File(file, mimeType, fileName);
+                }
             }
             return BadRequest();
         }
@@ -57,131 +61,36 @@ namespace Collectiv.FileServer.Controllers
                 return BadRequest();
             }
 
-            return AddOrUpdateFilePackage(filePackageDTO) ? Ok() : BadRequest();
+            return fileService.AddOrUpdateFilePackage(filePackageDTO) ? Ok() : BadRequest();
         }
 
         // DELETE: api/<FileController>?containerId=1&packageId=1&fileName=image.jpg"
         [HttpDelete]
-        public bool Delete([FromQuery] Guid containerId, [FromQuery] Guid packageId, [FromQuery] string fileName)
+        public bool Delete([FromQuery] Guid containerId, [FromQuery] Guid? packageId, [FromQuery] string fileName)
         {
-            var fullPath = Path.Combine(baseDir, containerId.ToString(), packageId.ToString(), fileName);
-
-            // Delete directories as they become empty
-
-            TryDeleteDirectory(Path.Combine(baseDir, containerId.ToString(), packageId.ToString()));
-            TryDeleteDirectory(Path.Combine(baseDir, containerId.ToString()));
-
-            return DeleteFile(fullPath);
-        }
-
-        private bool TryDeleteDirectory(string directory)
-        {
-            if(directory == "/UserData")
+            if (containerId != Guid.Empty)
             {
-                return false;
-            }
-
-            if (!Directory.EnumerateFileSystemEntries(directory).Any())
-            {
-                try
+                if (packageId is not null && packageId != Guid.Empty)
                 {
-                    Directory.Delete(directory);
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        private bool AddOrUpdateFilePackage(FilePackageDTO filePackageDTO)
-        {
-            try
-            {
-                // Bad data
-                if (filePackageDTO.Id == Guid.Empty
-                    || (filePackageDTO.ContainerId == Guid.Empty)
-                    || filePackageDTO.Files.Any(file => file.FileData is null)
-                    || filePackageDTO.Files.Any(file => file.FileData.Length <= 0))
-                {
-                    return false;
-                }
-
-                string directory = baseDir;
-                
-                directory = Path.Combine(directory, $"{filePackageDTO.ContainerId}", $"{filePackageDTO.Id}");
-
-                if (!Directory.Exists(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
-                else
-                {
-                    // The directory already exists, so make sure files that are no longer in the package get deleted
-                    foreach (var fileName in Directory.EnumerateFiles(directory))
+                    if (!string.IsNullOrWhiteSpace(fileName))
                     {
-                        if (filePackageDTO.Files.Any(file => Path.GetFileName(file.FullPath) == fileName))
-                        {
-                            continue;
-                        }
-                        DeleteFile(Path.Combine(directory, fileName));
+                        bool isSuccess = fileService.DeleteFile(containerId, (Guid)packageId, fileName);
+
+                        // Delete directories as they become empty
+                        fileService.TryDeleteDirectory(containerId, packageId);
+                        fileService.TryDeleteDirectory(containerId);
+
+                        return isSuccess;
                     }
+
+                    return fileService.TryDeleteDirectory(containerId, packageId, recursive: true);
                 }
 
-                foreach (var fileDTO in filePackageDTO.Files)
-                {
-                    if(!AddFile(directory, fileDTO))
-                    { 
-                        return false;
-                    }
-                }
-                return true;
+                return fileService.TryDeleteDirectory(containerId, recursive: true);
             }
-            catch
-            {
-                return false;
-            }
-        }
 
-        private byte[] GetFile(string fullPath)
-        {
-            return System.IO.File.ReadAllBytes(fullPath);
-        }
+            return false;
 
-        private bool AddFile(string directory, FileDTO fileDTO)
-        {
-            try
-            {
-                var fullPath = Path.Combine(directory, Path.GetFileName(fileDTO.FullPath));
-
-                var fileStream = new FileStream(fullPath, FileMode.Create);
-                var memoryStream = new MemoryStream(fileDTO.FileData);
-                memoryStream.CopyTo(fileStream);
-                fileStream.Close();
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private bool DeleteFile(string fullPath)
-        {
-            try
-            {
-                if (System.IO.File.Exists(fullPath))
-                {
-                    System.IO.File.Delete(fullPath);
-                }
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }

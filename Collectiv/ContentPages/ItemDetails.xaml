@@ -5,6 +5,18 @@
              xmlns:converters="clr-namespace:Collectiv.Converters"
              xmlns:viewModels="clr-namespace:Collectiv.ViewModels"
              x:Class="Collectiv.ContentPages.ItemDetails">
+    <Shell.TitleView>
+        <Grid>
+            <Label VerticalOptions="Center" FontSize="Large" Margin="5,0,0,0">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Item Details: "/>
+                        <Span Text="{Binding ItemViewModel.Container.Name}" FontAttributes="Bold"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </Grid>
+    </Shell.TitleView>
     <ContentPage.Resources>
         <converters:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter"/>
     </ContentPage.Resources>
@@ -23,19 +35,18 @@
                 </RadialGradientBrush.GradientStops>
             </RadialGradientBrush>
         </Grid.Background>
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <HorizontalStackLayout Grid.Column="1">
-                <Button Text="Add File Package" Margin="0,5,5,5" Command="{Binding ItemViewModel.AddFilePackageCommand}">
-                    <Button.ImageSource>
-                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf211;"/>
-                    </Button.ImageSource>
-                </Button>
-            </HorizontalStackLayout>
-        </Grid>
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
+            <Button Text="Add File Package" Margin="5" Command="{Binding ItemViewModel.AddFilePackageCommand}">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe1bc;"/>
+                </Button.ImageSource>
+            </Button>
+            <Button Text="Item Settings" Margin="0,5,5,5" Command="{Binding GoToSettingsCommand}">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xea94;"/>
+                </Button.ImageSource>
+            </Button>
+        </HorizontalStackLayout>
         <Line X1="0" Y1="0" X2="100" Y2="0" Grid.Row="1"/>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>

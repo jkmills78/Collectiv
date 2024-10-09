@@ -5,10 +5,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:contentPages="clr-namespace:Collectiv.ContentPages"
     Title="Collectiv">
-    <Shell.FlyoutHeader>
-        <Label Text="Collectiv"/>
-    </Shell.FlyoutHeader>
-
     <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
         <ShellContent Title="Collections" ContentTemplate="{DataTemplate contentPages:MainPage}">
             <ShellContent.Icon>

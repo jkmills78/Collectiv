@@ -11,10 +11,22 @@ public partial class ItemDetails : ContentPage
         ViewModel = viewModel;
     }
 
-    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
+    protected override void OnNavigatedTo(NavigatedToEventArgs args)
     {
         base.OnNavigatedTo(args);
         ViewModel.ItemViewModel.LoadAttributes();
-        await ViewModel.ItemViewModel.LoadFilePackages();
+        ViewModel.ItemViewModel.LoadFilePackages();
+    }
+
+    protected override bool OnBackButtonPressed()
+    {
+        foreach (var filePackageViewModel in ViewModel.ItemViewModel.FilePackageViewModels)
+        {
+            Task.Run(filePackageViewModel.Cancel).Wait();
+        }
+
+        Task.Run(ViewModel.ItemViewModel.Cancel).Wait();
+
+        return base.OnBackButtonPressed();
     }
 }

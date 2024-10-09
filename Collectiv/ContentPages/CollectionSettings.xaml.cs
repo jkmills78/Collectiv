@@ -10,4 +10,21 @@ public partial class CollectionSettings : ContentPage
 		InitializeComponent();
 		ViewModel = viewModel;
 	}
+
+    protected override bool OnBackButtonPressed()
+    {
+        foreach (var itemViewModel in ViewModel.CollectionViewModel.ItemViewModels)
+        {
+            Task.Run(itemViewModel.Cancel).Wait();
+        }
+
+        foreach (var filePackageViewModel in ViewModel.CollectionViewModel.FilePackageViewModels)
+        {
+            Task.Run(filePackageViewModel.Cancel).Wait();
+        }
+
+        Task.Run(ViewModel.CollectionViewModel.Cancel).Wait();
+
+        return base.OnBackButtonPressed();
+    }
 }

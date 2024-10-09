@@ -2,15 +2,25 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:converters="clr-namespace:Collectiv.Converters"
-             x:Class="Collectiv.ContentPages.HostSettings"
-             Title="HostSettings">
+             x:Class="Collectiv.ContentPages.HostSettings">
+    <Shell.TitleView>
+        <Grid>
+            <Label VerticalOptions="Center" FontSize="Large" Margin="5,0,0,0">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Host Settings"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </Grid>
+    </Shell.TitleView>
     <ContentPage.Resources>
         <converters:HostModeConverter x:Key="HostModeConverter"/>
     </ContentPage.Resources>
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,*">
         <Label Text="Host Mode:" Grid.Row="0" Grid.Column="0" Margin="5"/>
-        <RadioButton Content="Hosted" IsChecked="{Binding HostModeValue, Converter={StaticResource HostModeConverter}, ConverterParameter=Hosted}" Grid.Row="0" Grid.Column="1" Margin="0,5,5,5" />
-        <RadioButton Content="Local" IsChecked="{Binding HostModeValue, Converter={StaticResource HostModeConverter}, ConverterParameter=Local}" Grid.Row="0" Grid.Column="2" Margin="0,5,5,5" />
+        <RadioButton GroupName="HostMode" Content="Hosted" IsChecked="{Binding HostModeValue, Mode=TwoWay, Converter={StaticResource HostModeConverter}, ConverterParameter=Hosted}" Grid.Row="0" Grid.Column="1" Margin="0,5,5,5" />
+        <RadioButton GroupName="HostMode" Content="Local" IsChecked="{Binding HostModeValue, Mode=TwoWay, Converter={StaticResource HostModeConverter}, ConverterParameter=Local}" Grid.Row="0" Grid.Column="2" Margin="0,5,5,5" />
 
         <Label Text="Host Address:" Grid.Row="1" Grid.Column="0" Margin="0,0,5,5"/>
         <Entry Text="{Binding HostAddressValue}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="0,0,5,5" ToolTipProperties.Text="i.e. https://localhost:32771"/>

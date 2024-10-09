@@ -1,4 +1,5 @@
-﻿using Collectiv.Interfaces;
+﻿using Collectiv.ContentPages;
+using Collectiv.Interfaces;
 using Collectiv.Models;
 using Collectiv.Services;
 using System;
@@ -50,60 +51,29 @@ namespace Collectiv.ViewModels
                         await applicationDbService.RemoveAsync<FilePackage>(FilePackageViewModel.FilePackage.Id);
 
                         ItemViewModel.FilePackageViewModels.Remove(FilePackageViewModel);
-                        ItemViewModel.Container.FilePackages.Remove(ItemViewModel.Container.FilePackages.Single(filePackage => filePackage.Id == FilePackageViewModel.FilePackage.Id));
+                        var filePackage = ItemViewModel.Container.FilePackages.SingleOrDefault(filePackage => filePackage.Id == FilePackageViewModel.FilePackage.Id);
+                        if ((filePackage != null))
+                        {
+                            ItemViewModel.Container.FilePackages.Remove(ItemViewModel.Container.FilePackages.Single(filePackage => filePackage.Id == FilePackageViewModel.FilePackage.Id));
+                        }
                         return;
-                    }
-
-                    if (FilePackageViewModel.IsConfirmed)
-                    {
-                        // New data must be posted no matter what
-                        if (App.HostMode.Value == "Hosted")
-                        {
-                            var filePackageDto = new FilePackageDTO
-                            {
-                                ContainerId = FilePackageViewModel.FilePackage.ContainerId,
-                                Id = FilePackageViewModel.FilePackage.Id,
-                                Name = FilePackageViewModel.FilePackage.Name,
-                                Description = FilePackageViewModel.FilePackage.Description
-                            };
-
-                            foreach (var fileViewModel in FilePackageViewModel.FileViewModels)
-                            {
-                                filePackageDto.Files.Add(new FileDTO
-                                {
-                                    FilePackageId = fileViewModel.File.FilePackageId,
-                                    FileName = fileViewModel.FileName,
-                                    FullPath = fileViewModel.File.FullPath,
-                                    MimeType = fileViewModel.File.MimeType,
-                                    FileData = fileViewModel.FileData
-                                });
-                            }
-
-                            var response = await restService.PostFilePackageAsync(filePackageDto);
-                        }
-
-                        // Update
-                        if (ItemViewModel.FilePackageViewModels.Any(filePackageViewModel => filePackageViewModel.FilePackage.Id == FilePackageViewModel.FilePackage.Id))
-                        {
-                            await applicationDbService.UpdateAsync(FilePackageViewModel.FilePackage);
-                            var filePackageViewModel = ItemViewModel.FilePackageViewModels.SingleOrDefault(filePackageViewModel => filePackageViewModel.FilePackage.Id == FilePackageViewModel.FilePackage.Id);
-                            if (filePackageViewModel is not null)
-                            {
-                                filePackageViewModel.FilePackage = FilePackageViewModel.FilePackage;
-                            }
-                        }
-
-                        // Add
-                        else
-                        {
-                            FilePackageViewModel.FilePackage.Container = null;
-                            await applicationDbService.AddAsync(FilePackageViewModel.FilePackage);
-                            ItemViewModel.FilePackageViewModels.Add(FilePackageViewModel);
-                            ItemViewModel.Container.FilePackages.Add(FilePackageViewModel.FilePackage);
-                        }
                     }
                 }
             }
+        }
+
+        [RelayCommand]
+        async Task GoToSettings()
+        {
+            if (ItemViewModel is null)
+            {
+                return;
+            }
+
+            await Shell.Current.GoToAsync(nameof(ItemSettings), true, new Dictionary<string, object>
+            {
+                { "ItemViewModel", ItemViewModel }
+            });
         }
     }
 }

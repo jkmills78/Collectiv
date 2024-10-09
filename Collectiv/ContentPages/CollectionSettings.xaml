@@ -2,14 +2,21 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:contentViews="clr-namespace:Collectiv.ContentViews"
-             x:Class="Collectiv.ContentPages.CollectionSettings"
-             Title="CollectionSettings">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+             xmlns:viewModels="clr-namespace:Collectiv.ViewModels"
+             x:Class="Collectiv.ContentPages.CollectionSettings">
+    <Shell.TitleView>
+        <Grid>
+            <Label VerticalOptions="Center" FontSize="Large" Margin="5,0,0,0">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Collection Settings: "/>
+                        <Span Text="{Binding CollectionViewModel.Container.Name}" FontAttributes="Bold"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </Grid>
+    </Shell.TitleView>
+    <Grid RowDefinitions="Auto,Auto,*">
         <Grid.Background>
             <RadialGradientBrush Center="0.5,0.5">
                 <RadialGradientBrush.GradientStops>
@@ -18,41 +25,51 @@
                 </RadialGradientBrush.GradientStops>
             </RadialGradientBrush>
         </Grid.Background>
-        <Label Grid.Row="0" TextColor="#f3f3f3" FontSize="18" FontAttributes="Bold">
-            <Label.FormattedText>
-                <FormattedString>
-                    <Span Text="{Binding Collection.Name}"/>
-                    <Span Text=": Settings"/>
-                </FormattedString>
-            </Label.FormattedText>
-        </Label>
-        <Line Grid.Row="1" X1="0" Y1="0" X2="100" Y2="0"/>
-        <Grid Grid.Row="2">
-            <VerticalStackLayout>
-                <Label Text="Attributes Available to Items" Margin="5" VerticalOptions="Center" HorizontalOptions="Center" TextColor="#f3f3f3"/>
-                <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
-                    <Button Text="Add Attribute" Margin="0,5,5,5" Command="{Binding CollectionViewModel.AddAttributeCommand}">
-                        <Button.ImageSource>
-                            <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe2c0;"/>
-                        </Button.ImageSource>
-                    </Button>
-                    <Button Text="Remove Attribute" Margin="0,5,5,5" Command="{Binding CollectionViewModel.RemoveAttributeCommand}">
-                        <Button.ImageSource>
-                            <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe2cf;"/>
-                        </Button.ImageSource>
-                    </Button>
-                </HorizontalStackLayout>
-                <CollectionView SelectionMode="Single"
-                                ItemsSource="{Binding CollectionViewModel.AvailableAttributeViewModels}"
-                                SelectedItem="{Binding CollectionViewModel.AvailableAttributeViewModels.SelectedItem}"
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*">
+            <Label Text="Danger Zone" HorizontalOptions="Start" TextColor="#f3f3f3" VerticalOptions="Center" Margin="5,10,5,10" Grid.Column="0"/>
+            <Switch x:Name="DangerZone" IsToggled="false" HorizontalOptions="Start" Margin="0,10,5,10" Grid.Column="1"/>
+            <Button Text="Remove Collection" Command="{Binding CollectionViewModel.RemoveContainerCommand}" Background="#aa0000" Grid.Column="2" HorizontalOptions="End" Margin="5">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Reference DangerZone}, Path=IsToggled}" Value="False" TargetType="Button">
+                                <Setter Property="IsVisible" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf34d;"/>
+                </Button.ImageSource>
+            </Button>
+        </Grid>
+        <BoxView HeightRequest="1" BackgroundColor="LightGray" Grid.Row="1"/>
+        <Grid Grid.Row="2" RowDefinitions="Auto,*,Auto">
+            <CollectionView SelectionMode="Single"
+                                ItemsSource="{Binding CollectionViewModel.AttributeViewModels}"
+                                SelectedItem="{Binding CollectionViewModel.AttributeViewModels.SelectedItem}"
                                 Grid.Row="1">
+                    <CollectionView.Header>
+                        <Label Text="Available Attributes" FontSize="Medium" FontAttributes="Bold" TextColor="#f3f3f3" VerticalOptions="Center" HorizontalOptions="Center" Margin="5"/>
+                    </CollectionView.Header>
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <contentViews:CollectionAttribute/>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-            </VerticalStackLayout>
+            <HorizontalStackLayout Grid.Row="2" HorizontalOptions="Center">
+                <Button Text="Add Attribute" Margin="25,25,5,25" Command="{Binding CollectionViewModel.AddAttributeCommand}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf10d;"/>
+                    </Button.ImageSource>
+                </Button>
+                <Button Text="Remove Attribute" Margin="0,25,25,25" Command="{Binding CollectionViewModel.RemoveAttributeCommand}" Background="#aa0000">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf34d;"/>
+                    </Button.ImageSource>
+                </Button>
+            </HorizontalStackLayout>
         </Grid>
     </Grid>
 </ContentPage>

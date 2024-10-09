@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Collectiv.Bases
+namespace Collectiv.Abstracts
 {
     public abstract partial class Entity : ObservableValidator, IIdentifiable
     {

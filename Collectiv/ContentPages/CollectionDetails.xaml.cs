@@ -11,11 +11,28 @@ public partial class CollectionDetails : ContentPage
         ViewModel = viewModel;
 	}
 
-    protected override async void OnNavigatedTo(NavigatedToEventArgs args)
+    protected override void OnNavigatedTo(NavigatedToEventArgs args)
     {
         base.OnNavigatedTo(args);
         ViewModel.CollectionViewModel.LoadChildren();
-        ViewModel.CollectionViewModel.LoadAvailableAttributes();
-        await ViewModel.CollectionViewModel.LoadFilePackages();
+        ViewModel.CollectionViewModel.LoadAttributes();
+        ViewModel.CollectionViewModel.LoadFilePackages();
+    }
+
+    protected override bool OnBackButtonPressed()
+    {
+        foreach (var itemViewModel in ViewModel.CollectionViewModel.ItemViewModels)
+        {
+            Task.Run(itemViewModel.Cancel).Wait();
+        }
+
+        foreach (var filePackageViewModel in ViewModel.CollectionViewModel.FilePackageViewModels)
+        {
+            Task.Run(filePackageViewModel.Cancel).Wait();
+        }
+
+        Task.Run(ViewModel.CollectionViewModel.Cancel).Wait();
+
+        return base.OnBackButtonPressed();
     }
 }

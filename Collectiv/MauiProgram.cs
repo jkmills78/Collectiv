@@ -3,6 +3,7 @@ using Collectiv.Interfaces;
 using Collectiv.Models;
 using Collectiv.Services;
 using Collectiv.ViewModels;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
 namespace Collectiv
@@ -14,6 +15,7 @@ namespace Collectiv
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .RegisterDbContexts()
                 .RegisterServices()
                 .RegisterModels()
@@ -44,9 +46,9 @@ namespace Collectiv
 
         public static MauiAppBuilder RegisterServices(this MauiAppBuilder mauiAppBuilder)
         {
-            mauiAppBuilder.Services.AddTransient<ILoggingService, LoggingService>();
-            mauiAppBuilder.Services.AddTransient<IFileService, FileService>();
-            mauiAppBuilder.Services.AddTransient<IRESTService, RESTService>();
+            mauiAppBuilder.Services.AddSingleton<HttpClient>();
+            mauiAppBuilder.Services.AddSingleton<IFileService, FileService>();
+            mauiAppBuilder.Services.AddSingleton<IRESTService, RESTService>();
             mauiAppBuilder.Services.AddTransient<ApplicationDbService>();
             mauiAppBuilder.Services.AddTransient<SettingsDbService>();
 
@@ -69,6 +71,7 @@ namespace Collectiv
             mauiAppBuilder.Services.AddTransient<CollectionDetailsViewModel>();
             mauiAppBuilder.Services.AddTransient<CollectionSettingsViewModel>();
             mauiAppBuilder.Services.AddTransient<ItemDetailsViewModel>();
+            mauiAppBuilder.Services.AddTransient<ItemSettingsViewModel>();
             mauiAppBuilder.Services.AddTransient<FilePackageViewModel>();
             mauiAppBuilder.Services.AddTransient<FilePackageDetailsViewModel>();
 
@@ -82,6 +85,7 @@ namespace Collectiv
             mauiAppBuilder.Services.AddTransient<CollectionDetails>();
             mauiAppBuilder.Services.AddTransient<CollectionSettings>();
             mauiAppBuilder.Services.AddTransient<ItemDetails>();
+            mauiAppBuilder.Services.AddTransient<ItemSettings>();
             mauiAppBuilder.Services.AddTransient<FilePackageDetails>();
 
             return mauiAppBuilder;

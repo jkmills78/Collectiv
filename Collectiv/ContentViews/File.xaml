@@ -11,18 +11,33 @@
         <Border.StrokeShape>
             <RoundRectangle CornerRadius="10,10,10,10" />
         </Border.StrokeShape>
-        <Grid ColumnDefinitions="Auto,*,Auto">
+        <Grid RowDefinitions="*,Auto" ColumnDefinitions="Auto,*,Auto">
             <Image x:Name="Thumbnail"
                    Source="{Binding FileData, Converter={StaticResource ByteArrayToImageSourceConverter}}"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   Margin="5"
+                   WidthRequest="200" 
+                   HeightRequest="200" 
+                   IsVisible="{Binding IsImageFile}">
+                <Image.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="8,8"
+                            Radius="10"
+                            Opacity="0.8" />
+                </Image.Shadow>
+            </Image>
+            <Image Grid.Row="0"
                    Grid.Column="0"
                    Margin="5"
                    WidthRequest="125" 
-                   HeightRequest="125" 
-                   IsVisible="{Binding IsImageFile}"/>
-            <Image Grid.Column="0"
-                   Margin="5"
-                   WidthRequest="125" 
                    HeightRequest="125">
+                <Image.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="8,8"
+                            Radius="10"
+                            Opacity="0.8" />
+                </Image.Shadow>
                 <Image.Source>
                     <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe532;" Color="#434343"/>
                 </Image.Source>
@@ -30,22 +45,26 @@
                     <Style TargetType="Image">
                         <Setter Property="IsVisible" Value="False"/>
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Reference Thumbnail}, Path=IsVisible}" Value="False" TargetType="Grid">
+                            <DataTrigger Binding="{Binding Source={x:Reference Thumbnail}, Path=IsVisible}" Value="False" TargetType="Image">
                                 <Setter Property="IsVisible" Value="True"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Image.Style>
             </Image>
-            <Grid RowDefinitions="Auto,Auto" Grid.Column="1" VerticalOptions="Center">
+            <Grid RowDefinitions="Auto,Auto,Auto" Grid.Row="0" Grid.Column="1" VerticalOptions="Center">
                 <Label Text="{Binding FileName}" Grid.Row="0" Margin="5"/>
                 <Label Text="{Binding FileSize}" Grid.Row="1" FontAttributes="Italic" Margin="5,0,5,5"/>
+                <Button Text="Delete File" Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:FilePackageDetailsViewModel}}, Path=FilePackageViewModel.RemoveFileCommand}" CommandParameter="{Binding .}" Grid.Row="2" HorizontalOptions="Start" Background="#aa0000">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf34d;"/>
+                    </Button.ImageSource>
+                </Button>
             </Grid>
-            <Button Text="Delete File" Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:FilePackageDetailsViewModel}}, Path=FilePackageViewModel.RemoveFileCommand}" CommandParameter="{Binding .}" Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center">
-                <Button.ImageSource>
-                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf384;"/>
-                </Button.ImageSource>
-            </Button>
+            <HorizontalStackLayout Grid.Row="1" Grid.Column="0">
+                <Label Text="Cover Image" HorizontalOptions="Start" TextColor="#f3f3f3" VerticalOptions="Center" Margin="5,10,5,10" Grid.Column="0"/>
+                <Switch IsToggled="{Binding File.IsPrimary}" HorizontalOptions="Start" Margin="0,10,5,10" Grid.Column="1"/>
+            </HorizontalStackLayout>
         </Grid>
     </Border>
 </ContentView>

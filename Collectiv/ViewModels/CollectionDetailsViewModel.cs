@@ -53,57 +53,12 @@ namespace Collectiv.ViewModels
                         await applicationDbService.RemoveAsync<FilePackage>(FilePackageViewModel.FilePackage.Id);
 
                         CollectionViewModel.FilePackageViewModels.Remove(FilePackageViewModel);
-                        CollectionViewModel.Container.FilePackages.Remove(CollectionViewModel.Container.FilePackages.Single(filePackage => filePackage.Id == FilePackageViewModel.FilePackage.Id));
+                        var filePackage = CollectionViewModel.Container.FilePackages.SingleOrDefault(filePackage => filePackage.Id == FilePackageViewModel.FilePackage.Id);
+                        if ((filePackage != null))
+                        {
+                            CollectionViewModel.Container.FilePackages.Remove(CollectionViewModel.Container.FilePackages.Single(filePackage => filePackage.Id == FilePackageViewModel.FilePackage.Id));
+                        }
                         return;
-                    }
-                    
-                    if (FilePackageViewModel.IsConfirmed)
-                    {
-                        // New data must be posted no matter what
-                        if (App.HostMode.Value == "Hosted")
-                        {
-                            var filePackageDto = new FilePackageDTO
-                            {
-                                ContainerId = FilePackageViewModel.FilePackage.ContainerId,
-                                Id = FilePackageViewModel.FilePackage.Id,
-                                Name = FilePackageViewModel.FilePackage.Name,
-                                Description = FilePackageViewModel.FilePackage.Description
-                            };
-
-                            foreach (var fileViewModel in FilePackageViewModel.FileViewModels)
-                            {
-                                filePackageDto.Files.Add(new FileDTO
-                                {
-                                    FilePackageId = fileViewModel.File.FilePackageId,
-                                    FileName = fileViewModel.FileName,
-                                    FullPath = fileViewModel.File.FullPath,
-                                    MimeType = fileViewModel.File.MimeType,
-                                    FileData = fileViewModel.FileData
-                                });
-                            }
-
-                            var response = await restService.PostFilePackageAsync(filePackageDto);
-                        }
-
-                        // Update
-                        if (CollectionViewModel.FilePackageViewModels.Any(filePackageViewModel => filePackageViewModel.FilePackage.Id == FilePackageViewModel.FilePackage.Id))
-                        {
-                            await applicationDbService.UpdateAsync(FilePackageViewModel.FilePackage);
-                            var filePackageViewModel = CollectionViewModel.FilePackageViewModels.SingleOrDefault(filePackageViewModel => filePackageViewModel.FilePackage.Id == FilePackageViewModel.FilePackage.Id);
-                            if (filePackageViewModel is not null)
-                            {
-                                filePackageViewModel.FilePackage = FilePackageViewModel.FilePackage;
-                            }
-                        }
-
-                        // Add
-                        else
-                        {
-                            FilePackageViewModel.FilePackage.Container = null;
-                            await applicationDbService.AddAsync(FilePackageViewModel.FilePackage);
-                            CollectionViewModel.FilePackageViewModels.Add(FilePackageViewModel);
-                            CollectionViewModel.Container.FilePackages.Add(FilePackageViewModel.FilePackage);
-                        }
                     }
                 }
 

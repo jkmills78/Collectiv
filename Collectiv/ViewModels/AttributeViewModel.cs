@@ -1,4 +1,4 @@
-﻿using Collectiv.Bases;
+﻿using Collectiv.Abstracts;
 using Attribute = Collectiv.Models.Attribute;
 
 namespace Collectiv.ViewModels
@@ -6,22 +6,25 @@ namespace Collectiv.ViewModels
     public partial class AttributeViewModel : ViewModel
     {
         [ObservableProperty]
+        private bool isSelected;
+
+        [ObservableProperty]
         private bool isConfirmed;
 
         [ObservableProperty]
         private Attribute attribute;
 
         private Action<AttributeViewModel> cancel;
-        private Func<AttributeViewModel,Task> addAvailableAttributeToItems;
+        private Func<AttributeViewModel,Task> addAttributeToItems;
 
-        private string previousName;
-        private string previousValue;
+        private string oldName;
+        private string oldValue;
 
-        public AttributeViewModel(IServiceProvider serviceProvider, Action<AttributeViewModel> cancel, Func<AttributeViewModel,Task> addAvailableAttributeToItems)
+        public AttributeViewModel(IServiceProvider serviceProvider, Action<AttributeViewModel> cancel, Func<AttributeViewModel,Task> addAttributeToItems)
             :base(serviceProvider)
         {
             this.cancel = cancel;
-            this.addAvailableAttributeToItems = addAvailableAttributeToItems;
+            this.addAttributeToItems = addAttributeToItems;
         }
 
         [RelayCommand]
@@ -35,7 +38,10 @@ namespace Collectiv.ViewModels
             {
                 await applicationDbService.AddAsync(Attribute);
             }
-            await addAvailableAttributeToItems(this);
+            if (addAttributeToItems != null)
+            {
+                await addAttributeToItems.Invoke(this);
+            }
             IsConfirmed = true;
         }
 
@@ -44,8 +50,8 @@ namespace Collectiv.ViewModels
         {
             if (await applicationDbService.ExistsAsync<Attribute>(Attribute.Id))
             {
-                Attribute.Name = previousName;
-                Attribute.Value = previousValue;
+                Attribute.Name = oldName;
+                Attribute.Value = oldValue;
             }
             else
             {
@@ -55,10 +61,10 @@ namespace Collectiv.ViewModels
         }
 
         [RelayCommand]
-        void EditAttribute()
+        async Task EditAttribute()
         {
-            previousName = Attribute.Name;
-            previousValue = Attribute.Value;
+            oldName = Attribute.Name;
+            oldValue = Attribute.Value;
             IsConfirmed = !IsConfirmed;
         }
     }

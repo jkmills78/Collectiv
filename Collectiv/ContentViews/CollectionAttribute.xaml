@@ -2,12 +2,9 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Collectiv.ContentViews.CollectionAttribute">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.ColumnSpan="2">
+    <Grid ColumnDefinitions="5,*">
+        <Rectangle Grid.Column="0" Background="#00d933" IsVisible="{Binding IsSelected}"/>
+        <Grid Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -26,7 +23,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Entry Text="{Binding Attribute.Name}" Grid.Column="1" Margin="0,5,5,5" VerticalOptions="Center" FontSize="14" TextColor="#f3f3f3"/>
+                <Entry Text="{Binding Attribute.Name}" Grid.Column="1" Margin="0,5,5,5" VerticalOptions="Center" FontSize="Medium"/>
             </Grid>
             <HorizontalStackLayout Grid.Column="1">
                 <Button Margin="0,5,5,5" Command="{Binding ConfirmAttributeCommand}">
@@ -41,12 +38,12 @@
                 </Button>
             </HorizontalStackLayout>
         </Grid>
-        <Grid x:Name="AttributeNameValue" IsVisible="{Binding IsConfirmed}" Grid.ColumnSpan="2">
+        <Grid x:Name="AttributeNameValue" IsVisible="{Binding IsConfirmed}" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Label Text="{Binding Attribute.Name}" Grid.Column="0" Margin="5" VerticalOptions="Center" FontSize="14" TextColor="#f3f3f3"/>
+            <Label Text="{Binding Attribute.Name}" Grid.Column="0" Margin="5" VerticalOptions="Center" FontSize="Medium" TextColor="#f3f3f3"/>
             <HorizontalStackLayout Grid.Column="1" HorizontalOptions="End">
                 <Button Margin="0,5,5,5" HorizontalOptions="End" Command="{Binding EditAttributeCommand}">
                     <Button.ImageSource>

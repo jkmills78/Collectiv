@@ -1,5 +1,6 @@
 ﻿using Castle.Components.DictionaryAdapter;
-using Collectiv.Bases;
+using Collectiv.Abstracts;
+using Collectiv.Common.DTOs;
 using Collectiv.ContentPages;
 using Collectiv.Interfaces;
 using Collectiv.Models;
@@ -9,42 +10,43 @@ using Attribute = Collectiv.Models.Attribute;
 
 namespace Collectiv.ViewModels
 {
-    public partial class CollectionViewModel : ViewModel
+    public partial class CollectionViewModel : ContainerViewModel<CollectionViewModel>
     {
-        [ObservableProperty]
-        private FileViewModel coverImage;
-
         [ObservableProperty]
         private ICollection<ItemViewModel> itemViewModels;
 
-        [ObservableProperty]
-        private ICollection<AttributeViewModel> availableAttributeViewModels;
-
-        [ObservableProperty]
-        private ICollection<FilePackageViewModel> filePackageViewModels;
-
-        [ObservableProperty]
-        private bool isHostLoading;
-
-        private string previousName;
-
-        #region Backing Model
-
-        [ObservableProperty]
-        private Container container;
-
-        #endregion
-
-        private Action<CollectionViewModel> cancel;
-
-        public CollectionViewModel(IServiceProvider serviceProvider, Container container, Action<CollectionViewModel> cancel)
-            : base(serviceProvider)
+        public CollectionViewModel(IServiceProvider serviceProvider, Container container, Action<ContainerViewModel<CollectionViewModel>> cancel, Func<ContainerViewModel<CollectionViewModel>,Task> remove)
+            : base(serviceProvider, container, cancel, remove)
         {
-            AvailableAttributeViewModels = new ObservableCollection<AttributeViewModel>();
             ItemViewModels = new ObservableCollection<ItemViewModel>();
-            filePackageViewModels = new ObservableCollection<FilePackageViewModel>();
-            Container = container;
-            this.cancel = cancel;
+
+            AttributeViewModels.SelectedItemChanged += AttributeViewModels_SelectedItemChanged;
+        }
+
+        private void AttributeViewModels_SelectedItemChanged(object sender, AttributeViewModel e)
+        {
+            Guid attributeId = new Guid();
+            {
+                if (e is AttributeViewModel attributeViewModel)
+                {
+                    attributeId = attributeViewModel.Attribute.Id;
+                }
+            }
+
+            if (attributeId != Guid.Empty)
+            {
+                foreach (var attributeViewModel in AttributeViewModels)
+                {
+                    if (attributeViewModel.Attribute.Id == attributeId)
+                    {
+                        attributeViewModel.IsSelected = true;
+                    }
+                    else
+                    {
+                        attributeViewModel.IsSelected = false;
+                    }
+                }
+            }
         }
 
         #region Commands
@@ -66,101 +68,28 @@ namespace Collectiv.ViewModels
         [RelayCommand]
         async Task AddItem()
         {
-            var itemViewModel = new ItemViewModel(serviceProvider, CancelItem)
+            var itemContainer = new Container()
             {
-                Container = new Container()
-                {
-                    Id = Guid.NewGuid(), // Get the next Id and assign
-                    ParentId = Container.Id,
-                    Type = ContainerType.Item
-                }
+                Id = Guid.NewGuid(), // Get the next Id and assign
+                ParentId = Container.Id,
+                Type = ContainerType.Item,
+                Sequence = ItemViewModels.Select(viewModel => viewModel?.Container?.Sequence).Max() + 1 ?? 1
             };
 
-            foreach (var availableAttributeViewModel in AvailableAttributeViewModels)
+            var itemViewModel = new ItemViewModel(serviceProvider, itemContainer, CancelItem, RemoveItem);
+
+            foreach (var attributeViewModel in AttributeViewModels)
             {
-                itemViewModel.AddAvailableAttribute(availableAttributeViewModel);
+                itemViewModel.AddAttribute(attributeViewModel);
             }
 
             ItemViewModels.Add(itemViewModel);
         }
 
         [RelayCommand]
-        async Task AddFilePackage()
-        {
-            var filePackage = new FilePackage()
-            {
-                Id = Guid.NewGuid(), // Get the next Id and assign
-                ContainerId = Container.Id,
-                Container = Container
-            };
-
-            var filePackageViewModel = new FilePackageViewModel(serviceProvider, filePackage);
-
-            await Shell.Current.GoToAsync(nameof(FilePackageDetails), true, new Dictionary<string, object>
-            {
-                { "FilePackageViewModel", filePackageViewModel }
-            });
-        }
-
-        [RelayCommand]
-        async Task RemoveFilePackage()//(FilePackageViewModel filePackageViewModel)
-        {
-            //await applicationDbService.DeleteAsync<FilePackage>(filePackageViewModel.FilePackage.Id);
-            //FilePackageViewModels.Remove(filePackageViewModel);
-            //await Shell.Current.GoToAsync(nameof(CollectionDetails), true, new Dictionary<string, object>
-            //{
-            //    { "CollectionViewModel", this }
-            //});
-        }
-
-        [RelayCommand]
-        async Task EditFilePackage(FilePackageViewModel filePackageViewModel)
-        {
-            await Shell.Current.GoToAsync(nameof(FilePackageDetails), true, new Dictionary<string, object>
-            {
-                { "FilePackageViewModel", filePackageViewModel }
-            });
-        }
-
-        [RelayCommand]
-        async Task ConfirmContainer()
-        {
-            if (await applicationDbService.ExistsAsync<Container>(Container.Id))
-            {
-                await applicationDbService.UpdateAsync(Container);
-            }
-            else
-            {
-                await applicationDbService.AddAsync(Container);
-            }
-            IsConfirmed = true;
-        }
-
-        [RelayCommand]
-        async Task CancelContainer()
-        {
-            if (await applicationDbService.ExistsAsync<Container>(Container.Id))
-            {
-                Container.Name = previousName;
-            }
-            else
-            {
-                cancel(this);
-            }
-            IsConfirmed = true;
-        }
-
-        [RelayCommand]
-        void EditContainerName()
-        {
-            previousName = Container.Name;
-            IsConfirmed = !IsConfirmed;
-        }
-
-        [RelayCommand]
         async Task AddAttribute()
         {
-            var availableAttributeViewModel = new AttributeViewModel(serviceProvider, CancelAttribute, AddAvailableAttributeToItems)
+            var attributeViewModel = new AttributeViewModel(serviceProvider, CancelAttribute, AddAttributeToItems)
             {
                 Attribute = new Attribute()
                 {
@@ -169,22 +98,34 @@ namespace Collectiv.ViewModels
                 }
             };
 
-            AvailableAttributeViewModels.Add(availableAttributeViewModel);
+            AttributeViewModels.Add(attributeViewModel);
+        }
+
+        [RelayCommand]
+        async Task RemoveAttribute()
+        {
+            if (AttributeViewModels.SelectedItem == null)
+            {
+                return;
+            }
+
+            await applicationDbService.RemoveAsync<Attribute>(AttributeViewModels.SelectedItem.Attribute.Id);
+            AttributeViewModels.Remove(AttributeViewModels.SelectedItem);
         }
 
         #endregion
 
         #region Loaders
 
-        public void LoadAvailableAttributes()
+        public void LoadAttributes()
         {
-            AvailableAttributeViewModels.Clear();
+            AttributeViewModels.Clear();
 
             if (Container != null)
             {
                 foreach (var attribute in Container.Attributes)
                 {
-                    AvailableAttributeViewModels.Add(new AttributeViewModel(serviceProvider, CancelAttribute, AddAvailableAttributeToItems) { Attribute = attribute, IsConfirmed = true });
+                    AttributeViewModels.Add(new AttributeViewModel(serviceProvider, CancelAttribute, AddAttributeToItems) { Attribute = attribute, IsConfirmed = true });
                 };
             }
         }
@@ -197,59 +138,38 @@ namespace Collectiv.ViewModels
             {
                 foreach (var child in Container.Children)
                 {
-                    ItemViewModels.Add(new ItemViewModel(serviceProvider, CancelItem) { Container = child, IsConfirmed = true });
-                };
-            }
-        }
+                    var itemViewModel = new ItemViewModel(serviceProvider, child, CancelItem, RemoveItem) { IsConfirmed = true };
 
-        public async Task LoadFilePackages()
-        {
-            FilePackageViewModels.Clear();
-
-            if (Container != null)
-            {
-                foreach (var filePackage in Container.FilePackages)
-                {
-                    var filePackageViewModel = new FilePackageViewModel(serviceProvider, filePackage) { IsConfirmed = true };
-                    foreach(var file in filePackage.Files)
-                    {
-                        byte[] fileData;
-                        if (App.HostMode.Value == "Hosted")
-                        {
-                            fileData = await restService.GetFileAsync(filePackage.ContainerId, filePackage.Id, Path.GetFileName(file.FullPath));
-                        }
-                        else
-                        {
-                            fileData = System.IO.File.ReadAllBytes(file.FullPath);
-                        }
-
-                        var fileViewModel = new FileViewModel(serviceProvider, file) { FileData = fileData };
-                        filePackageViewModel.FileViewModels.Add(fileViewModel);
-
-                        if(filePackage.IsPrimary && file.IsPrimary)
-                        {
-                            CoverImage = fileViewModel;
-                        }
-                    }
-                    FilePackageViewModels.Add(filePackageViewModel);
+                    Task.Run(itemViewModel.LoadCoverImage).Wait();
+                    ItemViewModels.Add(itemViewModel);
                 };
             }
         }
 
         #endregion
 
-        private void CancelItem(ItemViewModel itemViewModel)
+        public async Task RemoveItem(ContainerViewModel<ItemViewModel> itemViewModel)
         {
-            ItemViewModels.Remove(itemViewModel);
+            if (App.HostMode.Value == "Hosted")
+            {
+                await restService.DeleteFilePackagesAsync(itemViewModel.Container.Id);
+            }
+
+            await applicationDbService.RemoveAsync<Container>(itemViewModel.Container.Id);
+            ItemViewModels.Remove(itemViewModel as ItemViewModel);
+        }
+
+        private void CancelItem(ContainerViewModel<ItemViewModel> itemViewModel)
+        {
+            ItemViewModels.Remove(itemViewModel as ItemViewModel);
         }
 
         private void CancelAttribute(AttributeViewModel attributeViewModel)
         {
-            AvailableAttributeViewModels.Remove(attributeViewModel);
+            AttributeViewModels.Remove(attributeViewModel);
         }
 
-
-        private async Task AddAvailableAttributeToItems(AttributeViewModel availableAttributeViewModel)
+        private async Task AddAttributeToItems(AttributeViewModel attributeViewModel)
         {
             foreach (var itemViewModel in ItemViewModels)
             {
@@ -257,7 +177,7 @@ namespace Collectiv.ViewModels
                 {
                     Id = Guid.NewGuid(),
                     ContainerId = itemViewModel.Container.Id,
-                    Name = availableAttributeViewModel.Attribute.Name
+                    Name = attributeViewModel.Attribute.Name
                 };
 
                 itemViewModel.AttributeViewModels.Add
