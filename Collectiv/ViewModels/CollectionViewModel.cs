@@ -1,124 +1,203 @@
-﻿using Collectiv.Bases;
+﻿using Castle.Components.DictionaryAdapter;
+using Collectiv.Abstracts;
+using Collectiv.Common.DTOs;
+using Collectiv.ContentPages;
+using Collectiv.Interfaces;
 using Collectiv.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using Attribute = Collectiv.Models.Attribute;
 
 namespace Collectiv.ViewModels
 {
-    public class CollectionViewModel : ObservableBase
+    public partial class CollectionViewModel : ContainerViewModel<CollectionViewModel>
     {
-        public Action RefreshCollectionList { get; set; }
-
-        private Action removeSelf;
-        private Action<int> selectSelf;
-
-        private bool isSettingsToggled;
-        private bool isConfirmed;
-        private readonly ApplicationDbContext dbContext;
-        private Collection collection;
+        [ObservableProperty]
         private ICollection<ItemViewModel> itemViewModels;
-        private ICollection<AttributeViewModel> availableAttributeViewModels;
 
-        public bool IsSettingsToggled { get => isSettingsToggled; set { isSettingsToggled = value; OnPropertyChanged(); } }
-
-        public bool IsConfirmed { get => isConfirmed; set { isConfirmed = value; OnPropertyChanged(); } }
-        
-        public Collection Collection { get => collection; set { collection = value; OnPropertyChanged(); } }
-        
-        public ICollection<ItemViewModel> ItemViewModels { get => itemViewModels; set => itemViewModels = value; }
-
-        public ICollection<AttributeViewModel> AvailableAttributeViewModels { get => availableAttributeViewModels; set { availableAttributeViewModels = value; OnPropertyChanged(); } }
-
-        //public void LoadCollection()
-        //{
-        //    LoadAvailableAttributes();
-        //    LoadItems();
-        //}
-
-        //private void LoadAvailableAttributes()
-        //{
-        //    AvailableAttributeViewModels = new ObservableCollection<AttributeViewModel>();
-        //    App.DbContext.CollectionAttribute.Load();
-        //    foreach (var item in App.DbContext.Item.Local.Where(x => x.Collection.Id == collection.Id))
-        //    {
-        //        ItemViewModels.Add(new ItemViewModel
-        //        {
-        //            Item = item
-        //        });
-        //    }
-        //}
-
-        //private void LoadItems()
-        //{
-        //    ItemViewModels = new ObservableCollection<ItemViewModel>();
-        //    App.DbContext.Item.Load();
-        //    foreach (var item in App.DbContext.Item.Local.Where(x => x.Collection.Id == collection.Id))
-        //    {
-        //        ItemViewModels.Add(new ItemViewModel
-        //        {
-        //            Item = item
-        //        });
-        //    }
-        //}
-
-        public CollectionViewModel(Action removeSelf, Action<int> selectSelf)
+        public CollectionViewModel(IServiceProvider serviceProvider, Container container, Action<ContainerViewModel<CollectionViewModel>> cancel, Func<ContainerViewModel<CollectionViewModel>,Task> remove)
+            : base(serviceProvider, container, cancel, remove)
         {
-            this.removeSelf = removeSelf;
-            this.selectSelf = selectSelf;
+            ItemViewModels = new ObservableCollection<ItemViewModel>();
+
+            AttributeViewModels.SelectedItemChanged += AttributeViewModels_SelectedItemChanged;
         }
 
-        public ICommand ConfirmCommand => new RelayCommand(execute =>
+        private void AttributeViewModels_SelectedItemChanged(object sender, AttributeViewModel e)
         {
-            App.DbContext.Collection.Add(Collection);
-            IsConfirmed = true;
-        });
-
-        public ICommand CancelCommand => new RelayCommand(execute =>
-        {
-            selectSelf(collection.Id);
-            if (App.DbContext.Collection.Any(collection => collection.Id == this.collection.Id))
+            Guid attributeId = new Guid();
             {
-                // revert
-                //collection = App.DbContext.Collection.SingleOrDefault(collection => collection.Id == this.collection.Id);
-                foreach (var entry in App.DbContext.ChangeTracker.Entries())
+                if (e is AttributeViewModel attributeViewModel)
                 {
-                    switch (entry.State)
+                    attributeId = attributeViewModel.Attribute.Id;
+                }
+            }
+
+            if (attributeId != Guid.Empty)
+            {
+                foreach (var attributeViewModel in AttributeViewModels)
+                {
+                    if (attributeViewModel.Attribute.Id == attributeId)
                     {
-                        case EntityState.Modified:
-                        case EntityState.Deleted:
-                            entry.State = EntityState.Modified; //Revert changes made to deleted entity.
-                            entry.State = EntityState.Unchanged;
-                            break;
-                        case EntityState.Added:
-                            entry.State = EntityState.Detached;
-                            break;
+                        attributeViewModel.IsSelected = true;
+                    }
+                    else
+                    {
+                        attributeViewModel.IsSelected = false;
                     }
                 }
-                IsConfirmed = true;
-                RefreshCollectionList();
             }
-            else
+        }
+
+        #region Commands
+
+        [RelayCommand]
+        async Task GoToCollectionDetails()
+        {
+            if (Container is null)
             {
-                removeSelf();
+                return;
             }
-        });
 
-        public ICommand ToggleSettingsCommand => new RelayCommand(execute =>
-        {
-            selectSelf(collection.Id);
-            IsSettingsToggled = !IsSettingsToggled;
-        });
+            await Shell.Current.GoToAsync(nameof(CollectionDetails), true, new Dictionary<string, object>
+            {
+                { "CollectionViewModel", this }
+            });
+        }
 
-        public ICommand EditNameCommand => new RelayCommand(execute =>
+        [RelayCommand]
+        async Task AddItem()
         {
-            IsConfirmed = !IsConfirmed;
-        });
+            var itemContainer = new Container()
+            {
+                Id = Guid.NewGuid(), // Get the next Id and assign
+                ParentId = Container.Id,
+                Type = ContainerType.Item,
+                Sequence = ItemViewModels.Select(viewModel => viewModel?.Container?.Sequence).Max() + 1 ?? 1
+            };
+
+            var itemViewModel = new ItemViewModel(serviceProvider, itemContainer, CancelItem, RemoveItem);
+
+            foreach (var attributeViewModel in AttributeViewModels)
+            {
+                itemViewModel.AddAttribute(attributeViewModel);
+            }
+
+            ItemViewModels.Add(itemViewModel);
+        }
+
+        [RelayCommand]
+        async Task AddAttribute()
+        {
+            var attributeViewModel = new AttributeViewModel(serviceProvider, CancelAttribute, AddAttributeToItems)
+            {
+                Attribute = new Attribute()
+                {
+                    Id = Guid.NewGuid(), // Get the next Id and assign
+                    ContainerId = Container.Id
+                }
+            };
+
+            AttributeViewModels.Add(attributeViewModel);
+        }
+
+        [RelayCommand]
+        async Task RemoveAttribute()
+        {
+            if (AttributeViewModels.SelectedItem == null)
+            {
+                return;
+            }
+
+            await applicationDbService.RemoveAsync<Attribute>(AttributeViewModels.SelectedItem.Attribute.Id);
+            AttributeViewModels.Remove(AttributeViewModels.SelectedItem);
+        }
+
+        #endregion
+
+        #region Loaders
+
+        public void LoadAttributes()
+        {
+            AttributeViewModels.Clear();
+
+            if (Container != null)
+            {
+                foreach (var attribute in Container.Attributes)
+                {
+                    AttributeViewModels.Add(new AttributeViewModel(serviceProvider, CancelAttribute, AddAttributeToItems) { Attribute = attribute, IsConfirmed = true });
+                };
+            }
+        }
+
+        public void LoadChildren()
+        {
+            ItemViewModels.Clear();
+
+            if (Container != null)
+            {
+                foreach (var child in Container.Children)
+                {
+                    var itemViewModel = new ItemViewModel(serviceProvider, child, CancelItem, RemoveItem) { IsConfirmed = true };
+
+                    Task.Run(itemViewModel.LoadCoverImage).Wait();
+                    ItemViewModels.Add(itemViewModel);
+                };
+            }
+        }
+
+        #endregion
+
+        public async Task RemoveItem(ContainerViewModel<ItemViewModel> itemViewModel)
+        {
+            if (App.HostMode.Value == "Hosted")
+            {
+                await restService.DeleteFilePackagesAsync(itemViewModel.Container.Id);
+            }
+
+            await applicationDbService.RemoveAsync<Container>(itemViewModel.Container.Id);
+            ItemViewModels.Remove(itemViewModel as ItemViewModel);
+        }
+
+        private void CancelItem(ContainerViewModel<ItemViewModel> itemViewModel)
+        {
+            ItemViewModels.Remove(itemViewModel as ItemViewModel);
+        }
+
+        private void CancelAttribute(AttributeViewModel attributeViewModel)
+        {
+            AttributeViewModels.Remove(attributeViewModel);
+        }
+
+        private async Task AddAttributeToItems(AttributeViewModel attributeViewModel)
+        {
+            foreach (var itemViewModel in ItemViewModels)
+            {
+                var attribute = new Attribute
+                {
+                    Id = Guid.NewGuid(),
+                    ContainerId = itemViewModel.Container.Id,
+                    Name = attributeViewModel.Attribute.Name
+                };
+
+                itemViewModel.AttributeViewModels.Add
+                (
+                    new AttributeViewModel(serviceProvider, null, null)
+                    {
+                        Attribute = attribute,
+                        IsConfirmed = true
+                    }
+                );
+
+                if(await applicationDbService.ExistsAsync<Attribute>(attribute.Id))
+                {
+                    await applicationDbService.UpdateAsync(attribute);
+                }
+                else
+                {
+                    await applicationDbService.AddAsync(attribute);
+                }
+            }
+        }
     }
 }

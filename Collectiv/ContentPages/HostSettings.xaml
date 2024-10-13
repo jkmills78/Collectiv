@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:Collectiv.Converters"
+             x:Class="Collectiv.ContentPages.HostSettings">
+    <Shell.TitleView>
+        <Grid>
+            <Label VerticalOptions="Center" FontSize="Large" Margin="5,0,0,0">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Host Settings"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </Grid>
+    </Shell.TitleView>
+    <ContentPage.Resources>
+        <converters:HostModeConverter x:Key="HostModeConverter"/>
+    </ContentPage.Resources>
+    <Border Margin="10" Padding="10" Background="AliceBlue">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="5" />
+        </Border.StrokeShape>
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,*">
+            <Label Text="Host Mode:" Grid.Row="0" Grid.Column="0" VerticalOptions="Center" HorizontalOptions="End" Margin="5"/>
+            <RadioButton GroupName="HostMode" Content="Hosted" IsChecked="{Binding HostModeValue, Mode=TwoWay, Converter={StaticResource HostModeConverter}, ConverterParameter=Hosted}" Grid.Row="0" Grid.Column="1" VerticalOptions="Center" Margin="0,5,5,5" />
+            <RadioButton GroupName="HostMode" Content="Local" IsChecked="{Binding HostModeValue, Mode=TwoWay, Converter={StaticResource HostModeConverter}, ConverterParameter=Local}" Grid.Row="0" Grid.Column="2" VerticalOptions="Center" Margin="0,5,5,5" />
+
+            <Label Text="Host Address:" Grid.Row="1" Grid.Column="0" VerticalOptions="Center" HorizontalOptions="End" Margin="0,0,5,5"/>
+            <Entry Text="{Binding HostAddressValue}" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" VerticalOptions="Center" Margin="0,0,5,5" ToolTipProperties.Text="i.e. https://localhost:32771"/>
+
+            <Label Text="Host API Key:" Grid.Row="2" Grid.Column="0" VerticalOptions="Center" HorizontalOptions="End" Margin="0,0,5,5"/>
+            <Entry Text="{Binding HostAPIKeyValue}" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" VerticalOptions="Center" Margin="0,0,5,5"/>
+
+            <Label Text="Host Username:" Grid.Row="3" Grid.Column="0" VerticalOptions="Center" HorizontalOptions="End" Margin="0,0,5,5"/>
+            <Entry Text="{Binding HostUsernameValue}" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" VerticalOptions="Center" Margin="0,0,5,5"/>
+
+            <Label Text="Host Password:" Grid.Row="4" Grid.Column="0" VerticalOptions="Center" HorizontalOptions="End" Margin="0,0,5,5"/>
+            <Entry Text="{Binding HostPasswordValue}" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" VerticalOptions="Center" Margin="0,0,5,5"/>
+
+
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto" Grid.Row="5" Grid.Column="2" HorizontalOptions="End" Margin="5">
+                <Button x:Name="SaveButton" Text="Save" Command="{Binding SaveSettingsCommand}" Grid.Row="0" Grid.Column="0" Margin="5" Clicked="SaveButton_Clicked">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf680;"/>
+                    </Button.ImageSource>
+                </Button>
+                <Button x:Name="RevertButton" Text="Revert" Command="{Binding RevertSettingsCommand}" Grid.Row="0" Grid.Column="1" Margin="0,5,5,5" Clicked="RevertButton_Clicked">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf1a0;"/>
+                    </Button.ImageSource>
+                </Button>
+                <Label x:Name="Status" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalOptions="Center" VerticalOptions="Center" Opacity="0" Margin="5"/>
+            </Grid>
+        </Grid>
+    </Border>
+</ContentPage>

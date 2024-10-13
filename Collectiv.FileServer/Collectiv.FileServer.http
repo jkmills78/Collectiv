@@ -1,0 +1,16 @@
+@Collectiv.FileServer_HostAddress = http://localhost:5062
+
+GET {{Collectiv.FileServer_HostAddress}}/api/File/
+Accept: application/json
+
+###
+
+POST {{Collectiv.FileServer_HostAddress}}/api/File/
+Accept: application/json
+
+###
+
+DELETE {{Collectiv.FileServer_HostAddress}}/api/File/
+Accept: application/json
+
+###
