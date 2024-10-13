@@ -9,6 +9,7 @@ namespace Collectiv
             InitializeComponent();
 
             Routing.RegisterRoute(nameof(MainPage), typeof(MainPage));
+            Routing.RegisterRoute(nameof(About), typeof(About));
             Routing.RegisterRoute(nameof(HostSettings), typeof(HostSettings));
             Routing.RegisterRoute(nameof(CollectionSettings), typeof(CollectionSettings));
             Routing.RegisterRoute(nameof(CollectionDetails), typeof(CollectionDetails));

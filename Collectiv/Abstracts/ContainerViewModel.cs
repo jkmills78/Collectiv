@@ -71,6 +71,30 @@ namespace Collectiv.Abstracts
             }
         }
 
+        private void FileViewModel_CoverImageChanged(object sender, EventArgs e)
+        {
+            if (sender is FileViewModel coverImage)
+            {
+                if (coverImage.File.IsPrimary)
+                {
+                    var filePackageViewModel = FilePackageViewModels.SingleOrDefault(x => x.FilePackage.Id == coverImage.File.FilePackageId);
+                    var fileViewModel = filePackageViewModel.FileViewModels.SingleOrDefault(x => x.File.Id == coverImage.File.Id);
+                    if (fileViewModel is null)
+                    {
+                        return;
+                    }
+
+                    foreach (var file in filePackageViewModel.FilePackage.Files.Where(x => x.Id != coverImage.File.Id))
+                    {
+                        file.IsPrimary = false;
+                    }
+
+                    Task.Run(() => applicationDbService.SetFilePrimacyAsync(fileViewModel.File)).Wait();
+                    Task.Run(LoadCoverImage).Wait();
+                }
+            }
+        }
+
         #region Commands
 
         [RelayCommand]
@@ -202,16 +226,18 @@ namespace Collectiv.Abstracts
                         }
 
                         var fileViewModel = new FileViewModel(serviceProvider, file) { FileData = fileData };
+                        fileViewModel.CoverImageChanged += FileViewModel_CoverImageChanged;
                         filePackageViewModel.FileViewModels.Add(fileViewModel);
 
                         if (file.IsPrimary)
                         {
                             filePackageViewModel.CoverImage = fileViewModel;
-                            filePackageViewModel.FilePackage.IsPrimary = filePackage.IsPrimary;
+                            fileViewModel.File.IsPrimary = file.IsPrimary;
 
                             if (filePackage.IsPrimary)
                             {
                                 CoverImage = fileViewModel;
+                                filePackageViewModel.FilePackage.IsPrimary = filePackage.IsPrimary;
                             }
                         }
                     }

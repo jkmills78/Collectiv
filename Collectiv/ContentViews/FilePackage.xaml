@@ -9,7 +9,7 @@
     </ContentView.Resources>
     <Border Margin="10" Padding="0" Background="AliceBlue">
         <Border.StrokeShape>
-            <RoundRectangle CornerRadius="20,20,20,20" />
+            <RoundRectangle CornerRadius="20" />
         </Border.StrokeShape>
         <Grid RowDefinitions="Auto,*,Auto,Auto" ColumnDefinitions="Auto,*">
             <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalOptions="FillAndExpand" Background="#e3e3e3">

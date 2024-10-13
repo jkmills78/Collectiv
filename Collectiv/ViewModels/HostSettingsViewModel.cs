@@ -55,7 +55,7 @@ namespace Collectiv.ViewModels
         }
 
         [RelayCommand]
-        async Task ResetSettings()
+        async Task RevertSettings()
         {
             HostModeValue = App.HostMode.Value;
             HostAddressValue = App.HostAddress.Value;

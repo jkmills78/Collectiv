@@ -1,6 +1,7 @@
 ﻿using Collectiv.Abstracts;
 using ByteSizeLib;
 using File = Collectiv.Models.File;
+using System.ComponentModel;
 
 namespace Collectiv.ViewModels
 {
@@ -21,6 +22,8 @@ namespace Collectiv.ViewModels
 
         public string FileSize => ByteSize.FromBytes(FileData?.Length ?? 0).ToString();
 
+        public event EventHandler CoverImageChanged;
+
         public FileViewModel(IServiceProvider serviceProvider, File file)
             : base(serviceProvider)
         {
@@ -32,6 +35,16 @@ namespace Collectiv.ViewModels
                 {
                     IsImageFile = true;
                 }
+            }
+
+            File.PropertyChanged += File_PropertyChanged;
+        }
+
+        private void File_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "IsPrimary")
+            {
+                CoverImageChanged?.Invoke(this, null);
             }
         }
     }

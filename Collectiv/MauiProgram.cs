@@ -66,6 +66,7 @@ namespace Collectiv
         public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder mauiAppBuilder)
         {
             mauiAppBuilder.Services.AddSingleton<MainPageViewModel>();
+            mauiAppBuilder.Services.AddSingleton<AboutViewModel>();
             mauiAppBuilder.Services.AddSingleton<HostSettingsViewModel>();
             mauiAppBuilder.Services.AddTransient<CollectionViewModel>();
             mauiAppBuilder.Services.AddTransient<CollectionDetailsViewModel>();
@@ -81,6 +82,7 @@ namespace Collectiv
         public static MauiAppBuilder RegisterContentPages(this MauiAppBuilder mauiAppBuilder)
         {
             mauiAppBuilder.Services.AddSingleton<MainPage>();
+            mauiAppBuilder.Services.AddSingleton<About>();
             mauiAppBuilder.Services.AddSingleton<HostSettings>();
             mauiAppBuilder.Services.AddTransient<CollectionDetails>();
             mauiAppBuilder.Services.AddTransient<CollectionSettings>();

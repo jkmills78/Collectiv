@@ -50,14 +50,6 @@ namespace Collectiv.Services
                     }
                 }
 
-                var primaryFile = await dbContext.Set<Models.File>().SingleOrDefaultAsync(x => x.Id == file.Id);
-                if(primaryFile is null)
-                {
-                    return;
-                }
-
-                primaryFile.IsPrimary = file.IsPrimary;
-
                 await dbContext.SaveChangesAsync();
             }
             catch

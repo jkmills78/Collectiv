@@ -88,6 +88,28 @@ namespace Collectiv.ViewModels
             FileCount = FileViewModels.Count;
         }
 
+        private void FileViewModel_CoverImageChanged(object sender, EventArgs e)
+        {
+            if (sender is FileViewModel coverImage)
+            {
+                if (coverImage.File.IsPrimary)
+                {
+                    var fileViewModel = FileViewModels.SingleOrDefault(x => x.File.Id == coverImage.File.Id);
+                    if (fileViewModel is null)
+                    {
+                        return;
+                    }
+
+                    foreach (var file in FilePackage.Files.Where(x => x.Id != coverImage.File.Id))
+                    {
+                        file.IsPrimary = false;
+                    }
+
+                    Task.Run(() => applicationDbService.SetFilePrimacyAsync(fileViewModel.File)).Wait();
+                }
+            }
+        }
+
         [RelayCommand]
         async Task AddFile()
         {
@@ -103,7 +125,7 @@ namespace Collectiv.ViewModels
                     Definitions = MimeDetective.Definitions.Default.All()
                 }.Build();
 
-                var mimeType = Inspector.Inspect(fileData)[0].Definition.File.MimeType;
+                var mimeType = Inspector.Inspect(fileData).FirstOrDefault()?.Definition.File.MimeType ?? "application/octet-stream";
 
                 var file = new Models.File()
                 {
@@ -115,6 +137,7 @@ namespace Collectiv.ViewModels
                 };
 
                 var fileViewModel = new FileViewModel(serviceProvider, file) { FileData = fileData };
+                fileViewModel.CoverImageChanged += FileViewModel_CoverImageChanged;
                 FileViewModels.Add(fileViewModel);
             }
         }

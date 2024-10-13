@@ -32,6 +32,11 @@ namespace Collectiv
             HostUsername = settings.SingleOrDefault(setting => setting.Name == "HostUsername");
             HostPassword = settings.SingleOrDefault(setting => setting.Name == "HostPassword");
 
+            if(string.IsNullOrWhiteSpace(HostAddress.Value))
+            {
+                HostAddress.Value = "https://localhost:32771";
+            }
+
             MainPage = new AppShell();
         }
     }

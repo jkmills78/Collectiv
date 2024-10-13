@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Collectiv.ContentViews.CollectionAttribute">
     <Grid ColumnDefinitions="5,*">
-        <Rectangle Grid.Column="0" Background="#00d933" IsVisible="{Binding IsSelected}"/>
+        <Rectangle Grid.Column="0" Background="#00d400" IsVisible="{Binding IsSelected}"/>
         <Grid Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

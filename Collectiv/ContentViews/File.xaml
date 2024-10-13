@@ -39,7 +39,7 @@
                             Opacity="0.8" />
                 </Image.Shadow>
                 <Image.Source>
-                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe532;" Color="#434343"/>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe532;" Color="#434343" Size="1000"/>
                 </Image.Source>
                 <Image.Style>
                     <Style TargetType="Image">

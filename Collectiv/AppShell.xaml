@@ -14,14 +14,14 @@
                 <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf2f2;" Color="#434343"/>
             </ShellContent.FlyoutIcon>
         </ShellContent>
-        <ShellContent Title="Advanced Search" ContentTemplate="{DataTemplate contentPages:MainPage}">
+        <!--<ShellContent Title="Advanced Search" ContentTemplate="{DataTemplate contentPages:MainPage}">
             <ShellContent.Icon>
                 <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#x000f0637;" Color="#434343"/>
             </ShellContent.Icon>
             <ShellContent.FlyoutIcon>
                 <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#x000f0637;" Color="#434343"/>
             </ShellContent.FlyoutIcon>
-        </ShellContent>
+        </ShellContent>-->
         <Tab Title="App Settings">
             <Tab.Icon>
                 <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf325;" Color="#434343"/>
@@ -29,6 +29,14 @@
             <Tab.FlyoutIcon>
                 <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf325;" Color="#434343"/>
             </Tab.FlyoutIcon>
+            <ShellContent Title="About" ContentTemplate="{DataTemplate contentPages:About}">
+                <ShellContent.Icon>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf4a4;" Color="#434343"/>
+                </ShellContent.Icon>
+                <ShellContent.FlyoutIcon>
+                    <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf4a4;" Color="#434343"/>
+                </ShellContent.FlyoutIcon>
+            </ShellContent>
             <ShellContent Title="Host Settings" ContentTemplate="{DataTemplate contentPages:HostSettings}">
                 <ShellContent.Icon>
                     <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe43c;" Color="#434343"/>
@@ -37,14 +45,14 @@
                     <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xe43c;" Color="#434343"/>
                 </ShellContent.FlyoutIcon>
             </ShellContent>
-            <ShellContent Title="Data Control" ContentTemplate="{DataTemplate contentPages:MainPage}">
+            <!--<ShellContent Title="Data Control" ContentTemplate="{DataTemplate contentPages:MainPage}">
                 <ShellContent.Icon>
                     <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#x000f0306;" Color="#434343"/>
                 </ShellContent.Icon>
                 <ShellContent.FlyoutIcon>
                     <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#x000f0306;" Color="#434343"/>
                 </ShellContent.FlyoutIcon>
-            </ShellContent>
+            </ShellContent>-->
         </Tab>        
     </FlyoutItem>
 </Shell>

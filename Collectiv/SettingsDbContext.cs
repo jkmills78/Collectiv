@@ -29,7 +29,7 @@ namespace Collectiv
             }
 
             modelBuilder.Entity<Setting>()
-                .HasData(new Setting { Id = new Guid("20000000-0000-0000-0000-000000000000"), Name = "HostAddress", Value = "" });
+                .HasData(new Setting { Id = new Guid("20000000-0000-0000-0000-000000000000"), Name = "HostAddress", Value = "https://localhost:32771" });
 
             modelBuilder.Entity<Setting>()
                 .HasData(new Setting { Id = new Guid("30000000-0000-0000-0000-000000000000"), Name = "HostAPIKey", Value = "" });
