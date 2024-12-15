@@ -199,7 +199,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="InnoSetupScript\" />
 	  <Folder Include="Properties\PublishProfiles\" />
 	  <Folder Include="Resources\Images\" />
 	</ItemGroup>
