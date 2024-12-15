@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <DockerfileRunArguments>-v "D:\WorkingData\HostFolder:/UserData:rw"</DockerfileRunArguments>
+    <Configurations>Debug;Release;Unpackaged</Configurations>
   </PropertyGroup>
   
   <PropertyGroup>
