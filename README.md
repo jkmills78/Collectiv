@@ -61,7 +61,7 @@ Using Collectiv on a mobile device is much different from using it on a desktop 
 
 ## How can I contribute?
 
-The interface design is adequate at best.  I am a programmer, not an artist, so all I can say is that I have done my best on that side.  If you want to help on that, I would be thrilled.  I also have never been much of a Apple person, so there are almost certainly Apple-specific issues that need to be corrected.  Better instructions for use would be nice to have as well.  Dare I dream, maybe even something "artsy" with animations?  There could also be some features that are as yet unfinished.  You will find those under the Issues section here in the repository.  By the time anyone even reads this, they may already be done, so check often.
+The interface design is adequate at best.  I am a programmer, not an artist, so all I can say is that I have done my best on that side.  If you want to help on that, I would be thrilled.  I also have never been much of a Mac person, so there are almost certainly Mac-specific issues that need to be corrected.  Better instructions for use would be nice to have as well.  Dare I dream, maybe even something "artsy" with animations?  There could also be some features that are as yet unfinished.  You will find those under the Issues section here in the repository.  By the time anyone even reads this, they may already be done, so check often.
 
 ## Who can I thank?
 
