@@ -29,6 +29,8 @@ Glad you asked!  I built Collectiv because I have a lot of vintage computers and
 
 ## Detailed Guide
 
+### Example scenario
+
 This detailed guide will be written using a contrived scenario so that it is easier to understand.  I personally enjoy collecting both video games and antique hand tools.  I'm sure anyone would agree that these are very different collections, and as such will have unique attributes associated with each.  Due to the flexibility of Collectiv, there are different ways you can create your collection, so you may choose to adopt a different structure from what I am exemplifying.
 
 Step 1.)  First I will create two new entries under collections.  One I will name ```Floppy Disks```, and the other ```Hand Tools```.  So far so good.
@@ -52,6 +54,10 @@ Now in my ```Item Details``` page, I will have the file gallery in the top porti
 Our first collection has been set up.  Now let's look at the ```Hand Tools```.  This will be much shorter since I have already outlined the steps.  One big difference that I want to point out though, is that while most of the same things can be done in this collection, one step is a bit different.  Gold star for the person who thought "I'm pretty sure hand tools don't have publishers or platforms."  This is where the flexibility begins to shine.  Instead of adding attributes for ```Platform``` or ```Publisher``` to the ```Collection Details```, I will add ```Tool Type``` and ```Manufacturer```, and instead of putting the values ```PC``` and ```LucasArts```, I will put ```Stanley``` and ```No. 5 Jack Plane```.
 
 Our second collection has now been set up.
+
+### Use on a Mobile Device
+
+Using Collectiv on a mobile device is much different from using it on a desktop device.  The biggest difference is that most people probably don't store all of the files associates with their collections on their mobile device.  On top of that, mobile devices have varying ways in which file storage is handled.  Because of this, I also created a file server that can be accessed remotely to handle this piece (see ```First things first...``` where I discuss the security implications of this).  The web API allows mobile devices to access the collection files remotely.  Please note that the internal database which stores the collection data is aways local to the application, so only the files are served.  I have provided a prebuilt docker image for use in this mode of operation, which you can find in [my docker hub](https://hub.docker.com/r/jkmills78/collectivfileserver).  Some NASes provide the capability of hosting docker images, so you may already have everything you need to set this up.  Once the file server is running on some remote host, make sure you go into the Collectiv Settings screen and change it to hosted mode, also providing the host address and port here.  When configuring the docker file, you will need to specify some additional settings. Port ```32770``` will need to be mapped to the docker container's port ```8080``` and port ```32771``` will need to be mapped to the docker container's port ```8081```.  You will also need to configure a volume using whatever host path you choose and it should be mapped to the ```/UserData``` volume inside of the docker image where it is already defined.
 
 ## How can I contribute?
 
