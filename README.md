@@ -79,7 +79,7 @@ This is a lightweight portable database, which I use for the internal storage of
 
 https://dotnet.microsoft.com/en-us/apps/maui
 
-.NET 8 Maui is the Microsoft framework upon which this is built, using Microsoft Visual Studio 2022, for my own personal Microsoft Windows 11 desktop.  Yeah, that's a lot of Microsoft.  I literally could not have built this without them.
+.NET 9 Maui is the Microsoft framework upon which this is built, using Microsoft Visual Studio 2022, for my own personal Microsoft Windows 11 desktop.  Yeah, that's a lot of Microsoft.  I literally could not have built this without them.
 
 ### Me
 
