@@ -39,11 +39,7 @@
                 <CollectionView SelectionMode="None" ItemsSource="{Binding CollectionViewModels}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <contentViews:CollectionHeader>
-                                <contentViews:CollectionHeader.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding GoToCollectionDetailsCommand}"/>
-                                </contentViews:CollectionHeader.GestureRecognizers>
-                            </contentViews:CollectionHeader>
+                            <contentViews:CollectionHeader/>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>

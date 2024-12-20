@@ -89,11 +89,7 @@
                 Grid.Row="4">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <contentViews:ItemHeader>
-                        <contentViews:ItemHeader.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding GoToItemDetailsCommand}"/>
-                        </contentViews:ItemHeader.GestureRecognizers>
-                    </contentViews:ItemHeader>
+                    <contentViews:ItemHeader/>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

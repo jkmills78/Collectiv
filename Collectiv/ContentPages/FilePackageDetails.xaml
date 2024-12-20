@@ -48,11 +48,6 @@
             </Button>
         </Grid>
         <BoxView HeightRequest="1" BackgroundColor="LightGray" Grid.Row="1"/>
-        <!--<Button Text="Delete File Package" Command="{Binding FilePackageViewModel.RemoveFilePackageCommand}" Grid.Row="0" Background="#aa0000" HorizontalOptions="End" Margin="5">
-            <Button.ImageSource>
-                <FontImageSource FontFamily="FluentIconsRegular" Glyph="&#xf34d;"/>
-            </Button.ImageSource>
-        </Button>-->
         <Grid RowDefinitions="Auto,*" Grid.Row="2">
             <Entry Placeholder="File Package Name..." Text="{Binding FilePackageViewModel.FilePackage.Name}" Grid.Row="0" Margin="10"/>
             <ScrollView Grid.Row="1">

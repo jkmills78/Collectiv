@@ -122,7 +122,7 @@ namespace Collectiv.ViewModels
 
                 var Inspector = new ContentInspectorBuilder()
                 {
-                    Definitions = MimeDetective.Definitions.Default.All()
+                    Definitions = MimeDetective.Definitions.DefaultDefinitions.All()
                 }.Build();
 
                 var mimeType = Inspector.Inspect(fileData).FirstOrDefault()?.Definition.File.MimeType ?? "application/octet-stream";
