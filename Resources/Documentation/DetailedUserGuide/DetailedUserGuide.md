@@ -1,6 +1,6 @@
 # Collectiv
 
-## Example scenario
+## Detailed User Guide - Example Scenario
 
 This detailed guide will be written using a contrived scenario so that it is easier to understand.  I personally enjoy collecting both video games and antique hand tools.  I'm sure anyone would agree that these are very different collections, and as such will have unique attributes associated with each.  Due to the flexibility of Collectiv, there are different ways you can create your collection, so you may choose to adopt a different structure from what I am exemplifying.
 
