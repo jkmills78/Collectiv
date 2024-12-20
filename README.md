@@ -1,5 +1,7 @@
 # Collectiv
 
+![image](logo.png)
+
 Collectiv is a free open-source multiplatform software for collection tracking. If you like my work, please consider [buying me a coffee](https://buymeacoffee.com/jkmills78).
 
 ##  First things first...
