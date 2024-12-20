@@ -54,6 +54,9 @@
             </HorizontalStackLayout>
         </Grid>
         <Grid x:Name="ContainerName" IsVisible="{Binding IsConfirmed}" Grid.Column="1">
+            <Grid.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding GoToItemDetailsCommand}"/>
+            </Grid.GestureRecognizers>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
